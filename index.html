@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASCII Imager</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      font-family: monospace;
+      background-color: #000;
+      color: #00FF00;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+      height: calc(100% - 200px);
+      max-width: none;
+      background-color: #000;
+      border-radius: 0;
+      overflow: hidden;
+    }
+
+    .input-column, .output-column {
+      width: 50%;
+      height: 100%;
+      padding: 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      border: none;
+    }
+
+    .input-column {
+      border-right: 1px solid #555;
+    }
+
+    .column-header {
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      box-sizing: border-box;
+      border-bottom: 1px solid #555;
+    }
+
+    .input-area {
+      width: 100%;
+      height: calc(100% - 100px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .input-area input[type="file"] {
+      margin-bottom: 10px;
+      width: 80%;
+    }
+
+    .imageCanvas {
+      border: 1px solid #555;
+      width: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      flex-grow: 1;
+    }
+
+    #outputCanvas {
+      background-color: black;
+      width: 100%;
+      max-width: 100%;
+      height: calc(100% - 100px);
+      object-fit: contain;
+      flex-grow: 1;
+      border: none;
+    }
+
+    #downloadLink {
+      display: none;
+    }
+
+    .upload-zone {
+      border: 4px dashed #555;
+      width: 80%;
+      height: 80%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .upload-zone:hover {
+      background-color: #002200;
+    }
+
+    .upload-zone i {
+      font-size: 3em;
+      margin-bottom: 10px;
+    }
+
+    .settings-panel {
+      width: 100%;
+      height: 200px;
+      background-color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px;
+      box-sizing: border-box;
+      border-top: 1px solid #555;
+    }
+
+    .settings-panel > div {
+      flex: 1;
+    }
+
+    .settings-panel .left {
+      text-align: left;
+    }
+
+    .settings-panel .center {
+      text-align: center;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    .settings-panel .right {
+        text-align: right;
+        display: flex; /* Use flexbox to align buttons vertically */
+        flex-direction: column; /* Stack the buttons */
+        align-items: flex-end;   /* Right-align the buttons */
+    }
+
+    .condensed-upload-zone {
+      border: 2px dashed #555;
+      padding: 10px;
+      cursor: pointer;
+      display: inline-block;
+      transition: background-color 0.2s;
+    }
+
+     .condensed-upload-zone:hover {
+        background-color: #002200;
+     }
+
+    .condensed-upload-zone input[type="file"] {
+        display: none;
+    }
+
+    .condensed-upload-zone label {
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .condensed-upload-zone .filename-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 5px;
+    }
+
+    .condensed-upload-zone .filename-container span {
+        margin-bottom: 5px;
+    }
+
+    .change-image-button {
+        background-color: #000;
+        color: #00FF00;
+        border: 1px solid #00FF00;
+        padding: 5px 10px;
+        cursor: pointer;
+        align-self: flex-end;
+    }
+
+    .download-button {
+      background-color: #000;
+      color: #00FF00;
+      border: 1px solid #00FF00;
+      padding: 10px 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      transition: background-color 0.2s;
+      margin-bottom: 5px; /* Add some space between the buttons */
+    }
+
+    .download-button:hover {
+      background-color: #002200;
+    }
+
+    .download-button i {
+      margin-right: 5px;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        height: calc(100% - 400px);
+      }
+
+      .input-column, .output-column {
+        width: 100%;
+        height: 50%;
+        padding: 0;
+        border-right: none;
+      }
+
+      .imageCanvas {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+      #outputCanvas {
+        width: 100%;
+        height: calc(50% - 100px);
+        max-width: 100%;
+      }
+
+      .upload-zone {
+        width: 100%;
+        height: 100%;
+      }
+
+       .settings-panel {
+          flex-direction: column;
+          height: 400px;
+       }
+
+       .settings-panel > div {
+            text-align: center;
+       }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/dist/remixicon.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <div class="input-column" id="inputColumn">
+      <div class="column-header">
+        <h2>Input Image</h2>
+      </div>
+      <div class="input-area">
+        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+        <div class="upload-zone" id="uploadZone">
+          <i class="ri-upload-cloud-2-line"></i>
+          Drag & Drop Image Here or Click to Upload
+        </div>
+        <canvas id="inputCanvas" class="imageCanvas"></canvas>
+      </div>
+    </div>
+
+    <div class="output-column">
+      <div class="column-header">
+        <h2>Output Image</h2>
+      </div>
+      <canvas id="outputCanvas"></canvas>
+      <a id="downloadLink" style="display: none;" download="ascii_imager.png">Download Image</a>
+    </div>
+  </div>
+
+  <div class="settings-panel">
+    <div class="left">
+      <div class="condensed-upload-zone" id="condensedUploadZone" style="display: none;">
+        <label for="condensedImageUpload">
+            <div class="filename-container">
+                <span id="condensedFilename"></span>
+                <button class="change-image-button" onclick="condensedImageUpload.click()">Change Image</button>
+            </div>
+            <input type="file" id="condensedImageUpload" accept="image/*">
+        </label>
+      </div>
+    </div>
+    <div class="center">
+      Settings (Slider Placeholders)
+    </div>
+    <div class="right">
+       <button class="download-button" onclick="downloadPng()">
+            <i class="ri-download-2-line"></i> Download as .png
+        </button>
+        <button class="download-button" onclick="downloadText()">
+            <i class="ri-download-2-line"></i> Download as .txt
+        </button>
+    </div>
+  </div>
+
+  <script>
+    const imageUpload = document.getElementById('imageUpload');
+    const inputCanvas = document.getElementById('inputCanvas');
+    const outputCanvas = document.getElementById('outputCanvas');
+    const inputCtx = inputCanvas.getContext('2d');
+    const outputCtx = outputCanvas.getContext('2d');
+    const downloadLink = document.getElementById('downloadLink');
+    const inputColumn = document.getElementById('inputColumn');
+    const uploadZone = document.getElementById('uploadZone');
+
+    const grayscaleLevels = [0, 0.25, 0.5, 0.75, 1];
+    let randomNumberMap = {};
+
+    const numbers = "0123456789";
+
+    const condensedImageUpload = document.getElementById('condensedImageUpload');
+    const condensedUploadZone = document.getElementById('condensedUploadZone');
+    const condensedFilename = document.getElementById('condensedFilename');
+
+    let currentBlobMatrix = null; // Store the blobMatrix data
+    let currentImgWidth = 0;  //Store the current values
+    let currentImgHeight = 0; //Store the current values
+
+    function getRandomNumber(grayscaleValue) {
+        if (!randomNumberMap[grayscaleValue]) {
+            randomNumberMap[grayscaleValue] = Math.floor(Math.random() * numbers.length);
+        }
+        return numbers[randomNumberMap[grayscaleValue]];
+    }
+
+    function handleImageUpload(file) {
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+          const img = new Image();
+          img.onload = function() {
+            const imgWidth = img.width;
+            const imgHeight = img.height;
+
+            currentImgWidth = imgWidth;//set img width and height values
+            currentImgHeight = imgHeight;
+
+            inputCanvas.width = imgWidth;
+            inputCanvas.height = imgHeight;
+
+            const charSize = 8;
+            outputCtx.font = charSize + 'px "Courier New", Courier, monospace';
+            const charWidth = charSize;
+            const charHeight = charSize;
+
+            outputCanvas.width = imgWidth * charWidth;
+            outputCanvas.height = imgHeight * charHeight;
+
+            inputCtx.drawImage(img, 0, 0, imgWidth, imgHeight);
+
+            currentBlobMatrix = drawOutputImage(img);
+
+            inputCanvas.style.display = 'block';
+            uploadZone.style.display = 'none';
+          }
+
+          img.src = event.target.result;
+        }
+
+        reader.readAsDataURL(file);
+    }
+
+    imageUpload.addEventListener('change', function(e) {
+       if (e.target.files && e.target.files[0]) {
+           handleImageUpload(e.target.files[0]);
+           condensedUploadZone.style.display = 'inline-block';
+           condensedFilename.innerHTML = `${e.target.files[0].name} `;
+
+       }
+    });
+
+    condensedImageUpload.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            handleImageUpload(file);
+            condensedFilename.innerHTML = `${file.name} `;
+        }
+    });
+
+    // Drag and drop functionality
+    inputColumn.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        inputColumn.style.backgroundColor = '#444';
+    });
+
+    inputColumn.addEventListener('dragleave', () => {
+        inputColumn.style.backgroundColor = '#333';
+    });
+
+    inputColumn.addEventListener('drop', (e) => {
+        e.preventDefault();
+        inputColumn.style.backgroundColor = '#333';
+
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+          handleImageUpload(file);
+        } else {
+            alert('Please drop an image file.');
+        }
+    });
+
+    uploadZone.addEventListener('click', () => {
+        imageUpload.click();
+    });
+
+    function drawOutputImage(img) {
+      const imgWidth = img.width;
+      const imgHeight = img.height;
+
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = imgWidth;
+      tempCanvas.height = imgHeight;
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCtx.drawImage(img, 0, 0);
+      const imageData = tempCtx.getImageData(0, 0, imgWidth, imgHeight).data;
+
+      let blobMatrix = [];
+
+      const charSize = 8;
+      outputCtx.font = charSize + 'px "Courier New", Courier, monospace';
+      const charWidth = charSize;
+      const charHeight = charSize;
+
+      for (let y = 0; y < imgHeight; y++) {
+        let blobRow = [];
+        for (let x = 0; x < imgWidth; x++) {
+          const i = (y * imgWidth + x) * 4;
+          const r = imageData[i];
+          const g = imageData[i + 1];
+          const b = imageData[i + 2];
+
+          const grayscale = (r + g + b) / 3;
+
+          let closestLevel = grayscaleLevels[0];
+          let minDiff = Math.abs(grayscale - closestLevel * 255);
+
+          for (let j = 1; j < grayscaleLevels.length; j++) {
+            const diff = Math.abs(grayscale - grayscaleLevels[j] * 255);
+            if (diff < minDiff) {
+              minDiff = diff;
+              closestLevel = grayscaleLevels[j];
+            }
+          }
+
+          let char = ' ';
+          let color = '#000';
+
+          if (closestLevel > 0) {
+            const randomNumber = getRandomNumber(closestLevel);
+            char = randomNumber.toString();
+            const greenValue = Math.round(closestLevel * 255);
+            color = `rgb(0, ${greenValue}, 0)`;
+          }
+
+          blobRow.push({char: char, color: color});
+        }
+        blobMatrix.push(blobRow);
+      }
+
+      function drawText() {
+        outputCtx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+        outputCtx.fillStyle = '#000';
+        outputCtx.fillRect(0, 0, outputCanvas.width, outputCanvas.height);
+
+        outputCtx.font = charSize + 'px "Courier New", Courier, monospace';
+        outputCtx.textAlign = 'left';
+        outputCtx.textBaseline = 'top';
+
+        let currentY = 0;
+        for (let y = 0; y < blobMatrix.length; y++) {
+          let currentX = 0;
+          for (let x = 0; x < blobMatrix[y].length; x++) {
+            outputCtx.fillStyle = blobMatrix[y][x].color;
+            outputCtx.fillText(blobMatrix[y][x].char, currentX, currentY);
+            currentX += charWidth;
+          }
+          currentY += charHeight;
+        }
+      }
+      requestAnimationFrame(drawText);
+        return blobMatrix;
+    }
+     function downloadPng() {
+        if (outputCanvas) {
+        const canvas = document.getElementById("outputCanvas");
+
+            const imgData = canvas.toDataURL("image/png");
+            const link = document.createElement('a');
+            link.href = imgData;
+            link.download = 'ascii_imager.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
+    function downloadText() {
+      if (currentBlobMatrix) {
+            const textToDownload = currentBlobMatrix.map(row => row.map(cell => cell.char).join('')).join('\n');
+            const blob = new Blob([textToDownload], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'ascii_imager.txt';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+      }
+    }
+
+    inputCanvas.style.display = 'none';
+  </script>
+
+</body>
+</html>
