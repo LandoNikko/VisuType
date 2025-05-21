@@ -73,12 +73,12 @@
     }
 
     .imageCanvas {
-      border: 1px solid #555;
       width: 100%;
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
       flex-grow: 1;
+      border: none;
     }
 
     #outputCanvas {
@@ -121,41 +121,90 @@
       height: 200px;
       background-color: #000;
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: space-between;
-      padding: 20px;
+      padding: 10px;
       box-sizing: border-box;
       border-top: 1px solid #555;
     }
 
-    .settings-panel > div {
+    .settings-section {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+      overflow-y: auto;
+      min-width: 120px; /* Ensure sections have some base width */
+    }
+     .settings-section.left { align-items: flex-start; justify-content: center; flex-grow: 0.7; }
+     .settings-section.right { align-items: flex-end; justify-content: center; flex-grow: 0.8;}
+     .settings-section.image-settings { flex-grow: 1; } /* Renamed center */
+     .settings-section.font-settings { flex-grow: 0.8; }
+     .settings-section.output-settings { flex-grow: 0.8; } /* New section */
+
+
+    .slider-container, .control-container { /* Generic container for controls */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 5px;
+        width: 100%;
     }
 
-    .settings-panel .left {
-      text-align: left;
+    .input-group { /* For number input with buttons */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .input-group button {
+        background-color: #000;
+        color: #00FF00;
+        border: 1px solid #00FF00;
+        padding: 3px 8px;
+        font-size: 1em;
+        cursor: pointer;
+        margin: 0 3px;
+    }
+     .input-group button:hover {
+        background-color: #002200;
+     }
+    .input-group input[type="number"] {
+        width: 50px;
+        text-align: center;
+        background-color: #000;
+        color: #00FF00;
+        border: 1px solid #555;
+        padding: 3px;
+        -moz-appearance: textfield;
+    }
+    .input-group input[type=number]::-webkit-outer-spin-button,
+    .input-group input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
     }
 
-    .settings-panel .center {
-      text-align: center;
-      width: 100%;
-      max-width: 300px;
-      margin: 0 auto;
+
+    .slider-container label, .control-container label {
+        margin-bottom: 2px;
+        font-size: 0.8em; /* Adjusted font size for labels */
+        white-space: nowrap; /* Prevent labels from wrapping too soon */
     }
 
-    .settings-panel .right {
-        text-align: right;
-        display: flex; /* Use flexbox to align buttons vertically */
-        flex-direction: column; /* Stack the buttons */
-        align-items: flex-end;   /* Right-align the buttons */
+    .slider-container input[type="range"] {
+        width: 90%;
+        max-width: 140px; /* Slightly smaller sliders */
     }
+
 
     .condensed-upload-zone {
       border: 2px dashed #555;
-      padding: 10px;
+      padding: 8px;
       cursor: pointer;
       display: inline-block;
       transition: background-color 0.2s;
+      margin-bottom: 8px;
     }
 
      .condensed-upload-zone:hover {
@@ -171,53 +220,67 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+        padding: 3px;
     }
     .condensed-upload-zone .filename-container {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        padding: 5px;
+        padding: 3px;
     }
 
     .condensed-upload-zone .filename-container span {
-        margin-bottom: 5px;
+        margin-bottom: 3px;
+        font-size: 0.85em;
     }
 
-    .change-image-button {
+    .change-image-button, .download-button {
         background-color: #000;
         color: #00FF00;
         border: 1px solid #00FF00;
-        padding: 5px 10px;
+        padding: 6px 10px; /* Adjusted padding */
         cursor: pointer;
-        align-self: flex-end;
+        display: inline-flex;
+        align-items: center;
+        transition: background-color 0.2s;
+        width: 170px; /* Adjusted width */
+        justify-content: center;
+        margin-bottom: 3px; /* Adjusted margin */
+        font-size: 0.8em; /* Adjusted font size */
+    }
+    .change-image-button{
+         width: 140px; /* Adjusted width */
+         font-size: 0.75em; /* Adjusted font size */
+         padding: 4px 7px; /* Adjusted padding */
     }
 
-    .download-button {
-      background-color: #000;
-      color: #00FF00;
-      border: 1px solid #00FF00;
-      padding: 10px 20px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      transition: background-color 0.2s;
-      margin-bottom: 5px; /* Add some space between the buttons */
-    }
 
-    .download-button:hover {
-      background-color: #002200;
+    .download-button:hover, .change-image-button:hover{
+        background-color: #002200;
     }
 
     .download-button i {
-      margin-right: 5px;
+        margin-right: 5px;
     }
+    .download-button:disabled {
+        color: #336633;
+        border-color: #336633;
+        cursor: not-allowed;
+        background-color: #001100;
+    }
+
 
     /* Mobile responsiveness */
     @media (max-width: 768px) {
       .container {
         flex-direction: column;
-        height: calc(100% - 400px);
+        height: calc(100% - 250px);
       }
+
+       .column-header {
+            height: 50px;
+            border-top: 1px solid #555;
+        }
 
       .input-column, .output-column {
         width: 100%;
@@ -235,7 +298,7 @@
 
       #outputCanvas {
         width: 100%;
-        height: calc(50% - 100px);
+        height: calc(100% - 50px);
         max-width: 100%;
       }
 
@@ -246,15 +309,32 @@
 
        .settings-panel {
           flex-direction: column;
-          height: 400px;
+          height: auto;
+          min-height: 250px;
+          padding: 10px;
        }
 
-       .settings-panel > div {
+       .settings-section {
             text-align: center;
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 0 5px;
+            overflow-y: visible;
        }
+       .settings-section.left, .settings-section.right, .settings-section.image-settings,
+       .settings-section.font-settings, .settings-section.output-settings {
+            align-items: center; /* Center all sections on mobile */
+       }
+
+        .change-image-button, .download-button {
+            width: 90%;
+            max-width: 220px;
+        }
+         .slider-container input[type="range"], .input-group input[type="number"] {
+            max-width: 180px;
+        }
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/dist/remixicon.min.js"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
@@ -276,7 +356,9 @@
 
     <div class="output-column">
       <div class="column-header">
-        <h2>Output Image</h2>
+        <h2>Output Image <span id="loadingSpinner" style="display: none;">
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g><rect width="2" height="5" x="11" y="1" fill="currentColor" opacity=".14"/><rect width="2" height="5" x="11" y="1" fill="currentColor" opacity=".29" transform="rotate(30 12 12)"/><rect width="2" height="5" x="11" y="1" fill="currentColor" opacity=".43" transform="rotate(60 12 12)"/><rect width="2" height="5" x="11" y="1" fill="currentColor" opacity=".57" transform="rotate(90 12 12)"/><rect width="2" height="5" x="11" y="1" fill="currentColor" opacity=".71" transform="rotate(120 12 12)"/><rect width="2" height="5" x="11" y="1" fill="currentColor" opacity=".86" transform="rotate(150 12 12)"/><rect width="2" height="5" x="11" y="1" fill="currentColor" transform="rotate(180 12 12)"/><animateTransform attributeName="transform" calcMode="discrete" dur="0.75s" repeatCount="indefinite" type="rotate" values="0 12 12;30 12 12;60 12 12;90 12 12;120 12 12;150 12 12;180 12 12;210 12 12;240 12 12;270 12 12;300 12 12;330 12 12;360 12 12"/></g></svg>
+        </span></h2>
       </div>
       <canvas id="outputCanvas"></canvas>
       <a id="downloadLink" style="display: none;" download="ascii_imager.png">Download Image</a>
@@ -284,25 +366,62 @@
   </div>
 
   <div class="settings-panel">
-    <div class="left">
+    <div class="settings-section left">
       <div class="condensed-upload-zone" id="condensedUploadZone" style="display: none;">
         <label for="condensedImageUpload">
             <div class="filename-container">
-                <span id="condensedFilename"></span>
-                <button class="change-image-button" onclick="condensedImageUpload.click()">Change Image</button>
+                <span id="condensedFilename"><i class="ri-check-line"></i> Select Image</span>
+                <button class="change-image-button" onclick="condensedImageUpload.click()"><i class="ri-upload-cloud-2-line"></i> Change Image</button>
             </div>
             <input type="file" id="condensedImageUpload" accept="image/*">
         </label>
       </div>
     </div>
-    <div class="center">
-      Settings (Slider Placeholders)
+    <div class="settings-section image-settings"> <!-- Renamed from center -->
+        <div class="slider-container">
+            <label for="levelsSlider">Grayscale Levels: <span id="levelsValueDisplay">4</span></label>
+            <input type="range" id="levelsSlider" min="2" max="8" value="4">
+        </div>
+        <div class="slider-container">
+            <label for="brightnessSlider">Brightness: <span id="brightnessValueDisplay">0</span></label>
+            <input type="range" id="brightnessSlider" min="-100" max="100" value="0">
+        </div>
+        <div class="slider-container">
+            <label for="contrastSlider">Contrast: <span id="contrastValueDisplay">0</span></label>
+            <input type="range" id="contrastSlider" min="-100" max="100" value="0">
+        </div>
     </div>
-    <div class="right">
-       <button class="download-button" onclick="downloadPng()">
+    <div class="settings-section font-settings">
+        <div class="control-container"> <!-- Using generic control-container -->
+            <label for="densityInput">Density: <span id="densityValueDisplay">10</span></label>
+            <div class="input-group"> <!-- Using generic input-group -->
+                <button id="densityDecrement"><</button>
+                <input type="number" id="densityInput" min="1" max="20" value="10">
+                <button id="densityIncrement">></button>
+            </div>
+        </div>
+    </div>
+    <div class="settings-section output-settings"> <!-- New Output Settings Section -->
+        <div class="control-container">
+            <label>Output: <span id="outputResolutionDisplay">-</span></label>
+        </div>
+        <div class="control-container">
+            <label for="scaleFactorInput">Scale Factor: <span id="scaleFactorValueDisplay">1</span>x</label>
+            <div class="input-group">
+                <button id="scaleFactorDecrement"><</button>
+                <input type="number" id="scaleFactorInput" min="1" max="5" value="1" step="0.5">
+                <button id="scaleFactorIncrement">></button>
+            </div>
+        </div>
+    </div>
+    <div class="settings-section right">
+        <button class="download-button" onclick="openNewTab()" id="openNewTabButton">
+            <i class="ri-external-link-line"></i> Open in New Tab
+        </button>
+         <button class="download-button" onclick="downloadPng()" id="downloadPngButton">
             <i class="ri-download-2-line"></i> Download as .png
         </button>
-        <button class="download-button" onclick="downloadText()">
+        <button class="download-button" onclick="downloadText()" id="downloadTextButton">
             <i class="ri-download-2-line"></i> Download as .txt
         </button>
     </div>
@@ -314,56 +433,250 @@
     const outputCanvas = document.getElementById('outputCanvas');
     const inputCtx = inputCanvas.getContext('2d');
     const outputCtx = outputCanvas.getContext('2d');
-    const downloadLink = document.getElementById('downloadLink');
-    const inputColumn = document.getElementById('inputColumn');
-    const uploadZone = document.getElementById('uploadZone');
-
-    const grayscaleLevels = [0, 0.25, 0.5, 0.75, 1];
-    let randomNumberMap = {};
-
-    const numbers = "0123456789";
+    const loadingSpinner = document.getElementById('loadingSpinner');
 
     const condensedImageUpload = document.getElementById('condensedImageUpload');
     const condensedUploadZone = document.getElementById('condensedUploadZone');
     const condensedFilename = document.getElementById('condensedFilename');
 
-    let currentBlobMatrix = null; // Store the blobMatrix data
-    let currentImgWidth = 0;  //Store the current values
-    let currentImgHeight = 0; //Store the current values
+    const levelsSlider = document.getElementById('levelsSlider');
+    const levelsValueDisplay = document.getElementById('levelsValueDisplay');
+    const brightnessSlider = document.getElementById('brightnessSlider');
+    const brightnessValueDisplay = document.getElementById('brightnessValueDisplay');
+    const contrastSlider = document.getElementById('contrastSlider');
+    const contrastValueDisplay = document.getElementById('contrastValueDisplay');
 
-    function getRandomNumber(grayscaleValue) {
-        if (!randomNumberMap[grayscaleValue]) {
-            randomNumberMap[grayscaleValue] = Math.floor(Math.random() * numbers.length);
+    const densityInput = document.getElementById('densityInput');
+    const densityValueDisplay = document.getElementById('densityValueDisplay');
+    const densityDecrement = document.getElementById('densityDecrement');
+    const densityIncrement = document.getElementById('densityIncrement');
+
+    const scaleFactorInput = document.getElementById('scaleFactorInput');
+    const scaleFactorValueDisplay = document.getElementById('scaleFactorValueDisplay');
+    const scaleFactorDecrement = document.getElementById('scaleFactorDecrement');
+    const scaleFactorIncrement = document.getElementById('scaleFactorIncrement');
+    const outputResolutionDisplay = document.getElementById('outputResolutionDisplay');
+
+
+    const openNewTabButton = document.getElementById('openNewTabButton');
+    const downloadPngButton = document.getElementById('downloadPngButton');
+    const downloadTextButton = document.getElementById('downloadTextButton');
+
+    let randomNumberMap = {};
+    const numbers = "0123456789";
+    let currentBlobMatrix = null;
+    let currentImageElement = null;
+    let originalPixelData = null;
+    let currentImageOriginalWidth = 0;
+    let currentImageOriginalHeight = 0;
+
+    let currentNumLevels = parseInt(levelsSlider.value);
+    let currentBrightness = parseInt(brightnessSlider.value);
+    let currentContrast = parseInt(contrastSlider.value);
+    let currentDensity = parseInt(densityInput.value);
+    let currentScaleFactor = parseFloat(scaleFactorInput.value); // New
+    const FIXED_FONT_SIZE = 8;
+
+
+    function setDownloadButtonsState(disabled) {
+        openNewTabButton.disabled = disabled;
+        downloadPngButton.disabled = disabled;
+        downloadTextButton.disabled = disabled;
+    }
+    setDownloadButtonsState(true);
+
+    function generateGrayscaleLevels(numLevels) {
+        if (numLevels < 2) return [0, 1];
+        const levels = [];
+        for (let i = 0; i < numLevels; i++) {
+            levels.push(i / (numLevels - 1));
         }
-        return numbers[randomNumberMap[grayscaleValue]];
+        return levels;
     }
 
+    function getRandomNumber(grayscaleValue) {
+        const key = `${grayscaleValue}`;
+        if (!randomNumberMap[key]) {
+            randomNumberMap[key] = Math.floor(Math.random() * numbers.length);
+        }
+        return numbers[randomNumberMap[key]];
+    }
+
+    function applyBrightnessContrast(sourcePixelData, width, height, brightness, contrast) {
+        const data = new Uint8ClampedArray(sourcePixelData);
+        const bVal = (brightness / 100.0) * 127.5;
+        const cFactor = (100.0 + contrast) / 100.0;
+
+        for (let i = 0; i < data.length; i += 4) {
+            let r = data[i] + bVal;
+            let g = data[i + 1] + bVal;
+            let b_ = data[i + 2] + bVal;
+
+            r = (((r / 255.0) - 0.5) * cFactor + 0.5) * 255.0;
+            g = (((g / 255.0) - 0.5) * cFactor + 0.5) * 255.0;
+            b_ = (((b_ / 255.0) - 0.5) * cFactor + 0.5) * 255.0;
+
+            data[i] = Math.max(0, Math.min(255, r));
+            data[i + 1] = Math.max(0, Math.min(255, g));
+            data[i + 2] = Math.max(0, Math.min(255, b_));
+        }
+        return data;
+    }
+
+    function generateBlobMatrix(pixelDataToProcess, originalWidth, originalHeight, levelsArray, densityStep) {
+        let blobMatrix = [];
+        for (let y = 0; y < originalHeight; y += densityStep) {
+            let blobRow = [];
+            for (let x = 0; x < originalWidth; x += densityStep) {
+                let avgR = 0, avgG = 0, avgB = 0, count = 0;
+                for (let subY = 0; subY < densityStep && (y + subY) < originalHeight; subY++) {
+                    for (let subX = 0; subX < densityStep && (x + subX) < originalWidth; subX++) {
+                        const i = ((y + subY) * originalWidth + (x + subX)) * 4;
+                        avgR += pixelDataToProcess[i];
+                        avgG += pixelDataToProcess[i+1];
+                        avgB += pixelDataToProcess[i+2];
+                        count++;
+                    }
+                }
+                if (count === 0) continue;
+                avgR /= count;
+                avgG /= count;
+                avgB /= count;
+
+                const grayscale = (avgR + avgG + avgB) / 3;
+
+                let closestLevelValue = levelsArray[0];
+                let minDiff = Math.abs(grayscale - closestLevelValue * 255);
+
+                for (let j = 1; j < levelsArray.length; j++) {
+                    const diff = Math.abs(grayscale - levelsArray[j] * 255);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closestLevelValue = levelsArray[j];
+                    }
+                }
+
+                let char = ' ';
+                let color = '#000';
+                 if (closestLevelValue > 0 || (levelsArray.length === 1 && levelsArray[0] === 0 && grayscale < 128) || (levelsArray.length > 1 && closestLevelValue === 0)) {
+                    const randomNumber = getRandomNumber(closestLevelValue);
+                    char = randomNumber.toString();
+                    const greenValue = Math.round(closestLevelValue * 255);
+                    color = `rgb(0, ${greenValue}, 0)`;
+                }
+                blobRow.push({char: char, color: color});
+            }
+            if (blobRow.length > 0) {
+                 blobMatrix.push(blobRow);
+            }
+        }
+        return blobMatrix;
+    }
+
+    function drawTextOnCanvas(matrixToDraw, scaleFactor) {
+        return new Promise((resolve) => {
+            requestAnimationFrame(() => {
+                const baseCharSize = FIXED_FONT_SIZE;
+                const effectiveCharSize = baseCharSize * scaleFactor;
+                const charWidth = effectiveCharSize;
+                const charHeight = effectiveCharSize;
+
+                if (matrixToDraw.length === 0 || matrixToDraw[0].length === 0) {
+                    outputCanvas.width = 1;
+                    outputCanvas.height = 1;
+                    outputCtx.clearRect(0,0,1,1);
+                    outputResolutionDisplay.textContent = `${outputCanvas.width}x${outputCanvas.height} px`;
+                    resolve();
+                    return;
+                }
+
+                const numOutputRows = matrixToDraw.length;
+                const numOutputCols = matrixToDraw[0].length;
+
+                outputCanvas.width = Math.max(1, numOutputCols * charWidth); // Ensure width is at least 1
+                outputCanvas.height = Math.max(1, numOutputRows * charHeight); // Ensure height is at least 1
+                outputResolutionDisplay.textContent = `${outputCanvas.width}x${outputCanvas.height} px`;
+
+
+                outputCtx.font = effectiveCharSize + 'px "Courier New", Courier, monospace';
+                outputCtx.textAlign = 'left';
+                outputCtx.textBaseline = 'top';
+
+                outputCtx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+                outputCtx.fillStyle = '#000';
+                outputCtx.fillRect(0, 0, outputCanvas.width, outputCanvas.height);
+
+                outputCtx.font = effectiveCharSize + 'px "Courier New", Courier, monospace';
+                outputCtx.textAlign = 'left';
+                outputCtx.textBaseline = 'top';
+
+                let currentY = 0;
+                for (let y = 0; y < numOutputRows; y++) {
+                    let currentX = 0;
+                    for (let x = 0; x < numOutputCols; x++) {
+                        if (matrixToDraw[y] && matrixToDraw[y][x]) {
+                            outputCtx.fillStyle = matrixToDraw[y][x].color;
+                            outputCtx.fillText(matrixToDraw[y][x].char, currentX, currentY);
+                        }
+                        currentX += charWidth;
+                    }
+                    currentY += charHeight;
+                }
+                resolve();
+            });
+        });
+    }
+
+    async function processImageWithCurrentSettings() {
+        if (!originalPixelData) return;
+
+        loadingSpinner.style.display = 'inline';
+        setDownloadButtonsState(true);
+
+        currentNumLevels = parseInt(levelsSlider.value);
+        currentBrightness = parseInt(brightnessSlider.value);
+        currentContrast = parseInt(contrastSlider.value);
+        currentDensity = parseInt(densityInput.value);
+        currentScaleFactor = parseFloat(scaleFactorInput.value);
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        const modifiedPixelData = applyBrightnessContrast(originalPixelData, currentImageOriginalWidth, currentImageOriginalHeight, currentBrightness, currentContrast);
+        const localGrayscaleLevels = generateGrayscaleLevels(currentNumLevels);
+        currentBlobMatrix = generateBlobMatrix(modifiedPixelData, currentImageOriginalWidth, currentImageOriginalHeight, localGrayscaleLevels, currentDensity);
+
+        await drawTextOnCanvas(currentBlobMatrix, currentScaleFactor);
+
+        loadingSpinner.style.display = 'none';
+        setDownloadButtonsState(false);
+    }
+
+
     function handleImageUpload(file) {
+       loadingSpinner.style.display = 'inline';
+       setDownloadButtonsState(true);
         const reader = new FileReader();
 
         reader.onload = function(event) {
           const img = new Image();
-          img.onload = function() {
-            const imgWidth = img.width;
-            const imgHeight = img.height;
+          img.onload = async function() {
+            currentImageElement = img;
+            currentImageOriginalWidth = img.width;
+            currentImageOriginalHeight = img.height;
+            randomNumberMap = {};
 
-            currentImgWidth = imgWidth;//set img width and height values
-            currentImgHeight = imgHeight;
+            inputCanvas.width = currentImageOriginalWidth;
+            inputCanvas.height = currentImageOriginalHeight;
+            inputCtx.drawImage(img, 0, 0, currentImageOriginalWidth, currentImageOriginalHeight);
 
-            inputCanvas.width = imgWidth;
-            inputCanvas.height = imgHeight;
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = currentImageOriginalWidth;
+            tempCanvas.height = currentImageOriginalHeight;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(img, 0, 0, currentImageOriginalWidth, currentImageOriginalHeight);
+            originalPixelData = tempCtx.getImageData(0, 0, currentImageOriginalWidth, currentImageOriginalHeight).data;
 
-            const charSize = 8;
-            outputCtx.font = charSize + 'px "Courier New", Courier, monospace';
-            const charWidth = charSize;
-            const charHeight = charSize;
-
-            outputCanvas.width = imgWidth * charWidth;
-            outputCanvas.height = imgHeight * charHeight;
-
-            inputCtx.drawImage(img, 0, 0, imgWidth, imgHeight);
-
-            currentBlobMatrix = drawOutputImage(img);
+            await processImageWithCurrentSettings();
 
             inputCanvas.style.display = 'block';
             uploadZone.style.display = 'none';
@@ -379,8 +692,7 @@
        if (e.target.files && e.target.files[0]) {
            handleImageUpload(e.target.files[0]);
            condensedUploadZone.style.display = 'inline-block';
-           condensedFilename.innerHTML = `${e.target.files[0].name} `;
-
+           condensedFilename.innerHTML = `<i class="ri-check-line"></i> ${e.target.files[0].name} `;
        }
     });
 
@@ -388,11 +700,99 @@
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             handleImageUpload(file);
-            condensedFilename.innerHTML = `${file.name} `;
+            condensedFilename.innerHTML = `<i class="ri-check-line"></i> ${file.name} `;
         }
     });
 
-    // Drag and drop functionality
+    levelsSlider.addEventListener('input', function() {
+        levelsValueDisplay.textContent = this.value;
+        processImageWithCurrentSettings();
+    });
+    brightnessSlider.addEventListener('input', function() {
+        brightnessValueDisplay.textContent = this.value;
+        processImageWithCurrentSettings();
+    });
+    contrastSlider.addEventListener('input', function() {
+        contrastValueDisplay.textContent = this.value;
+        processImageWithCurrentSettings();
+    });
+
+    function updateDensity(newValue) {
+        let val = parseInt(newValue);
+        const min = parseInt(densityInput.min);
+        const max = parseInt(densityInput.max);
+        if (isNaN(val)) val = currentDensity;
+        if (val < min) val = min;
+        if (val > max) val = max;
+        densityInput.value = val;
+        densityValueDisplay.textContent = val;
+        if (val !== currentDensity) {
+             currentDensity = val;
+             processImageWithCurrentSettings();
+        } else {
+            currentDensity = val;
+        }
+    }
+
+    densityInput.addEventListener('change', function() {
+        updateDensity(this.value);
+    });
+    densityInput.addEventListener('input', function() {
+        const val = parseInt(this.value);
+        const min = parseInt(densityInput.min);
+        const max = parseInt(densityInput.max);
+        if (!isNaN(val) && val >=min && val <=max) {
+            densityValueDisplay.textContent = this.value;
+        } else if (this.value === "") {
+            densityValueDisplay.textContent = min;
+        }
+    });
+    densityDecrement.addEventListener('click', function() {
+        updateDensity(parseInt(densityInput.value) - 1);
+    });
+    densityIncrement.addEventListener('click', function() {
+        updateDensity(parseInt(densityInput.value) + 1);
+    });
+
+    // Scale Factor Listeners
+    function updateScaleFactor(newValue) {
+        let val = parseFloat(newValue);
+        const min = parseFloat(scaleFactorInput.min);
+        const max = parseFloat(scaleFactorInput.max);
+        if (isNaN(val)) val = currentScaleFactor;
+        if (val < min) val = min;
+        if (val > max) val = max;
+        scaleFactorInput.value = val.toFixed(1); // Keep one decimal place
+        scaleFactorValueDisplay.textContent = val.toFixed(1);
+        if (val !== currentScaleFactor) {
+             currentScaleFactor = val;
+             processImageWithCurrentSettings(); // This will redraw with new scale
+        } else {
+            currentScaleFactor = val;
+        }
+    }
+
+    scaleFactorInput.addEventListener('change', function() {
+        updateScaleFactor(this.value);
+    });
+    scaleFactorInput.addEventListener('input', function() {
+        const val = parseFloat(this.value);
+        const min = parseFloat(scaleFactorInput.min);
+        const max = parseFloat(scaleFactorInput.max);
+         if (!isNaN(val) && val >=min && val <=max) {
+            scaleFactorValueDisplay.textContent = parseFloat(this.value).toFixed(1);
+        } else if (this.value === "") {
+            scaleFactorValueDisplay.textContent = min.toFixed(1);
+        }
+    });
+    scaleFactorDecrement.addEventListener('click', function() {
+        updateScaleFactor(parseFloat(scaleFactorInput.value) - 0.5);
+    });
+    scaleFactorIncrement.addEventListener('click', function() {
+        updateScaleFactor(parseFloat(scaleFactorInput.value) + 0.5);
+    });
+
+
     inputColumn.addEventListener('dragover', (e) => {
         e.preventDefault();
         inputColumn.style.backgroundColor = '#444';
@@ -405,10 +805,11 @@
     inputColumn.addEventListener('drop', (e) => {
         e.preventDefault();
         inputColumn.style.backgroundColor = '#333';
-
         const file = e.dataTransfer.files[0];
         if (file && file.type.startsWith('image/')) {
           handleImageUpload(file);
+          condensedUploadZone.style.display = 'inline-block';
+          condensedFilename.innerHTML = `<i class="ri-check-line"></i> ${file.name} `;
         } else {
             alert('Please drop an image file.');
         }
@@ -418,109 +819,43 @@
         imageUpload.click();
     });
 
-    function drawOutputImage(img) {
-      const imgWidth = img.width;
-      const imgHeight = img.height;
-
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = imgWidth;
-      tempCanvas.height = imgHeight;
-      const tempCtx = tempCanvas.getContext('2d');
-      tempCtx.drawImage(img, 0, 0);
-      const imageData = tempCtx.getImageData(0, 0, imgWidth, imgHeight).data;
-
-      let blobMatrix = [];
-
-      const charSize = 8;
-      outputCtx.font = charSize + 'px "Courier New", Courier, monospace';
-      const charWidth = charSize;
-      const charHeight = charSize;
-
-      for (let y = 0; y < imgHeight; y++) {
-        let blobRow = [];
-        for (let x = 0; x < imgWidth; x++) {
-          const i = (y * imgWidth + x) * 4;
-          const r = imageData[i];
-          const g = imageData[i + 1];
-          const b = imageData[i + 2];
-
-          const grayscale = (r + g + b) / 3;
-
-          let closestLevel = grayscaleLevels[0];
-          let minDiff = Math.abs(grayscale - closestLevel * 255);
-
-          for (let j = 1; j < grayscaleLevels.length; j++) {
-            const diff = Math.abs(grayscale - grayscaleLevels[j] * 255);
-            if (diff < minDiff) {
-              minDiff = diff;
-              closestLevel = grayscaleLevels[j];
-            }
-          }
-
-          let char = ' ';
-          let color = '#000';
-
-          if (closestLevel > 0) {
-            const randomNumber = getRandomNumber(closestLevel);
-            char = randomNumber.toString();
-            const greenValue = Math.round(closestLevel * 255);
-            color = `rgb(0, ${greenValue}, 0)`;
-          }
-
-          blobRow.push({char: char, color: color});
-        }
-        blobMatrix.push(blobRow);
-      }
-
-      function drawText() {
-        outputCtx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
-        outputCtx.fillStyle = '#000';
-        outputCtx.fillRect(0, 0, outputCanvas.width, outputCanvas.height);
-
-        outputCtx.font = charSize + 'px "Courier New", Courier, monospace';
-        outputCtx.textAlign = 'left';
-        outputCtx.textBaseline = 'top';
-
-        let currentY = 0;
-        for (let y = 0; y < blobMatrix.length; y++) {
-          let currentX = 0;
-          for (let x = 0; x < blobMatrix[y].length; x++) {
-            outputCtx.fillStyle = blobMatrix[y][x].color;
-            outputCtx.fillText(blobMatrix[y][x].char, currentX, currentY);
-            currentX += charWidth;
-          }
-          currentY += charHeight;
-        }
-      }
-      requestAnimationFrame(drawText);
-        return blobMatrix;
-    }
-     function downloadPng() {
-        if (outputCanvas) {
-        const canvas = document.getElementById("outputCanvas");
-
-            const imgData = canvas.toDataURL("image/png");
-            const link = document.createElement('a');
-            link.href = imgData;
-            link.download = 'ascii_imager.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+    function downloadPng() {
+        if (!outputCanvas || !currentBlobMatrix) return;
+        const imgData = outputCanvas.toDataURL("image/png");
+        const link = document.createElement('a');
+        link.href = imgData;
+        link.download = 'ascii_imager.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     function downloadText() {
       if (currentBlobMatrix) {
-            const textToDownload = currentBlobMatrix.map(row => row.map(cell => cell.char).join('')).join('\n');
-            const blob = new Blob([textToDownload], { type: "text/plain;charset=utf-8" });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'ascii_imager.txt';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        let textToDownload = "";
+        for (let y = 0; y < currentBlobMatrix.length; y++) {
+          let row = "";
+          for (let x = 0; x < currentBlobMatrix[y].length; x++) {
+            row += currentBlobMatrix[y][x].char;
+          }
+          textToDownload += row + "\n";
+        }
+        const blob = new Blob([textToDownload], { type: "text/plain;charset=utf-8" });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'ascii_imager.txt';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
     }
+
+   function openNewTab() {
+       if (!outputCanvas || !currentBlobMatrix) return;
+        const imgData = outputCanvas.toDataURL("image/png");
+        let newTab = window.open();
+        newTab.document.body.innerHTML = `<img src="${imgData}" style="max-width:100%; height:auto; background-color: black;">`;
+   }
 
     inputCanvas.style.display = 'none';
   </script>
