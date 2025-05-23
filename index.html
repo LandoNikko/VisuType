@@ -6,11 +6,14 @@
   <title>ASCII Imager</title>
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
   <style>
+    /* Google Fonts Import */
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Source+Code+Pro:wght@400;700&family=Space+Mono:wght@400;700&family=VT323&family=Cutive+Mono&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Noto+Sans:wght@400;700&family=Noto+Sans+Cyrllic:wght@400;700&display=swap'); /* Added Noto Sans for Latin/Cyrillic */
+
     html, body {
       height: 100%;
       margin: 0;
       overflow: hidden;
-      font-family: monospace;
+      font-family: "Courier New", Courier, monospace;
       background-color: #000;
       color: #00FF00;
     }
@@ -18,18 +21,18 @@
     body {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
     }
 
     .container {
       display: flex;
       width: 100%;
-      height: calc(100% - 200px);
       max-width: none;
       background-color: #000;
       border-radius: 0;
       overflow: hidden;
+      flex-grow: 1;
     }
 
     .input-column, .output-column {
@@ -56,7 +59,17 @@
       width: 100%;
       box-sizing: border-box;
       border-bottom: 1px solid #555;
+      flex-shrink: 0;
+      position: relative;
     }
+    .column-header h2 {
+        display: flex;
+        align-items: center;
+    }
+    #loadingSpinner {
+        margin-left: 10px;
+    }
+
 
     .input-area {
       width: 100%;
@@ -65,6 +78,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      flex-grow: 1;
     }
 
     .input-area input[type="file"] {
@@ -91,10 +105,6 @@
       border: none;
     }
 
-    #downloadLink {
-      display: none;
-    }
-
     .upload-zone {
       border: 4px dashed #555;
       width: 80%;
@@ -116,230 +126,314 @@
       margin-bottom: 10px;
     }
 
-    .settings-panel {
+    .settings-panel-container {
       width: 100%;
       height: 200px;
       background-color: #000;
       display: flex;
       align-items: stretch;
       justify-content: space-between;
-      padding: 10px;
       box-sizing: border-box;
       border-top: 1px solid #555;
+      flex-shrink: 0;
+      overflow-x: hidden;
     }
 
-    .settings-section {
+    .settings-panel-section-content {
       flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 0 5px;
+      justify-content: flex-start;
+      padding: 1rem;
       overflow-y: auto;
-      min-width: 120px; /* Ensure sections have some base width */
+      min-width: 150px;
+      font-size: 1em;
     }
-     .settings-section.left { align-items: flex-start; justify-content: center; flex-grow: 0.7; }
-     .settings-section.right { align-items: flex-end; justify-content: center; flex-grow: 0.8;}
-     .settings-section.image-settings { flex-grow: 1; } /* Renamed center */
-     .settings-section.font-settings { flex-grow: 0.8; }
-     .settings-section.output-settings { flex-grow: 0.8; } /* New section */
+     .upload-panel-content {
+        flex-grow: 0.4; align-items: flex-start;
+        border-right: 1px solid #555;
+        min-width: 180px;
+     }
+     .download-panel-content {
+        flex-grow: 0.4; align-items: flex-start;
+        border-left: 1px solid #555;
+        min-width: 180px;
+     }
+     .settings-title-section {
+        flex-grow: 0.1; flex-shrink: 0; flex-basis: auto;
+        align-items: flex-start; justify-content: flex-start; padding-right: 0;
+     }
+     .settings-image-content {
+        flex-grow: 1.5;
+        align-items: flex-start;
+     }
+     .settings-font-content {
+        flex-grow: 1;
+        align-items: flex-start;
+        min-width: 200px;
+     }
+     .settings-output-content {
+        flex-grow: 0.7;
+        align-items: flex-start;
+        min-width: 160px;
+     }
 
 
-    .slider-container, .control-container { /* Generic container for controls */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 5px;
+    .settings-panel-section-content h2 {
+        font-size: 1.3em;
+        margin: 0 0 10px 0;
         width: 100%;
+        text-align: left;
+        box-sizing: border-box;
     }
-
-    .input-group { /* For number input with buttons */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .input-group button {
-        background-color: #000;
-        color: #00FF00;
-        border: 1px solid #00FF00;
-        padding: 3px 8px;
-        font-size: 1em;
-        cursor: pointer;
-        margin: 0 3px;
-    }
-     .input-group button:hover {
-        background-color: #002200;
-     }
-    .input-group input[type="number"] {
-        width: 50px;
-        text-align: center;
-        background-color: #000;
-        color: #00FF00;
-        border: 1px solid #555;
-        padding: 3px;
-        -moz-appearance: textfield;
-    }
-    .input-group input[type=number]::-webkit-outer-spin-button,
-    .input-group input[type=number]::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-
-    .slider-container label, .control-container label {
-        margin-bottom: 2px;
-        font-size: 0.8em; /* Adjusted font size for labels */
-        white-space: nowrap; /* Prevent labels from wrapping too soon */
-    }
-
-    .slider-container input[type="range"] {
-        width: 90%;
-        max-width: 140px; /* Slightly smaller sliders */
-    }
-
-
-    .condensed-upload-zone {
-      border: 2px dashed #555;
-      padding: 8px;
-      cursor: pointer;
-      display: inline-block;
-      transition: background-color 0.2s;
-      margin-bottom: 8px;
-    }
-
-     .condensed-upload-zone:hover {
-        background-color: #002200;
-     }
-
-    .condensed-upload-zone input[type="file"] {
+    .upload-panel-content > h2.initially-hidden {
         display: none;
     }
 
-    .condensed-upload-zone label {
-        cursor: pointer;
+
+    .image-settings-layout, .output-settings-layout, .font-settings-layout {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        gap: 1rem;
+    }
+    .font-settings-layout {
+        gap: 1rem;
+    }
+    .settings-column {
+        flex: 1;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        padding: 3px;
     }
-    .condensed-upload-zone .filename-container {
+
+
+    .slider-container, .control-container, .checkbox-container, .reset-button-container {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        padding: 3px;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+    .control-container.char-set-control {
+        margin-bottom: 0px !important;
     }
 
-    .condensed-upload-zone .filename-container span {
-        margin-bottom: 3px;
-        font-size: 0.85em;
+    .checkbox-container {
+        flex-direction: row;
+        align-items: center;
+        margin-top: 5px;
     }
+    .checkbox-container input[type="checkbox"] {
+        margin-right: 8px; width: 16px; height: 16px; accent-color: #00FF00;
+        background-color: #333; border: 1px solid #555; cursor: pointer;
+        -webkit-appearance: none; -moz-appearance: none; appearance: none;
+        border-radius: 3px; position: relative;
+    }
+    .checkbox-container input[type="checkbox"]:checked {
+        background-color: #005500; border-color: #00FF00;
+    }
+    .checkbox-container input[type="checkbox"]:checked::before {
+        content: '\2713'; font-size: 12px; color: #00FF00;
+        position: absolute; left: 2px; top: 0px;
+    }
+    .checkbox-container label { font-size: 0.85em; cursor: pointer; }
 
-    .change-image-button, .download-button {
+
+    .control-container label { margin-bottom: 3px; font-size: 0.85em; white-space: nowrap; }
+     .control-container select, .select-group select {
+        background-color: #000; color: #00FF00; border: 1px solid #555;
+        padding: 5px; width: 100%; font-family: inherit;
+        box-sizing: border-box;
+        height: 28px;
+        max-width: 180px;
+     }
+    .select-group select {
+        flex-grow: 1;
+        margin: 0;
+    }
+    .control-container input[type="text"]#customCharsInput {
         background-color: #000;
         color: #00FF00;
-        border: 1px solid #00FF00;
-        padding: 6px 10px; /* Adjusted padding */
+        border: 1px solid #555;
+        padding: 5px;
+        width: 100%;
+        max-width: 180px;
+        box-sizing: border-box;
+        font-family: inherit;
+        margin-top: 5px;
+        height: 28px;
+    }
+    .presets-container {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        max-width: 180px;
+    }
+    .preset-button {
+        background-color: #111;
+        color: #00FF00;
+        border: 1px solid #555;
+        padding: 3px 6px;
+        font-size: 0.8em;
         cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        transition: background-color 0.2s;
-        width: 170px; /* Adjusted width */
-        justify-content: center;
-        margin-bottom: 3px; /* Adjusted margin */
-        font-size: 0.8em; /* Adjusted font size */
+        border-radius: 3px;
     }
-    .change-image-button{
-         width: 140px; /* Adjusted width */
-         font-size: 0.75em; /* Adjusted font size */
-         padding: 4px 7px; /* Adjusted padding */
-    }
-
-
-    .download-button:hover, .change-image-button:hover{
+    .preset-button:hover {
         background-color: #002200;
+        border-color: #00FF00;
     }
 
-    .download-button i {
-        margin-right: 5px;
+
+    .input-group, .select-group {
+        display: flex; align-items: center; width: 100%; max-width: 180px;
     }
+    .select-group {
+        gap: 0px;
+    }
+    .input-group button, .select-group button {
+        background-color: #000; color: #00FF00; border: 1px solid #00FF00;
+        padding: 5px 8px; font-size: 1em; cursor: pointer;
+        height: 28px; box-sizing: border-box;
+        flex-shrink: 0;
+        margin: 0;
+    }
+     .input-group button:hover, .select-group button:hover {
+        background-color: #002200;
+     }
+    .input-group input[type="number"] {
+        width: 50px; text-align: center; background-color: #000; color: #00FF00;
+        border: 1px solid #555; padding: 3px; height: 28px; box-sizing: border-box;
+        -moz-appearance: textfield; margin: 0 3px;
+    }
+    .input-group input[type=number]::-webkit-outer-spin-button,
+    .input-group input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none; margin: 0;
+    }
+
+    .slider-container label {
+        display: flex; justify-content: space-between; width: 100%;
+        margin-bottom: 3px; font-size: 0.85em; white-space: nowrap;
+    }
+    .slider-container label span { margin-left: 5px; color: #00FF00; }
+
+    input[type="range"] {
+        -webkit-appearance: none; appearance: none; width: 100%;
+        height: 8px; background: #333; outline: none; opacity: 0.7;
+        transition: opacity .15s ease-in-out; cursor: pointer; border-radius: 4px;
+    }
+    input[type="range"]:hover { opacity: 1; }
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none; appearance: none; width: 16px; height: 16px;
+        background: #00FF00; cursor: pointer; border-radius: 50%; border: 1px solid #000;
+    }
+    input[type="range"]::-moz-range-thumb {
+        width: 16px; height: 16px; background: #00FF00; cursor: pointer;
+        border-radius: 50%; border: 1px solid #000;
+    }
+
+    .condensed-upload-zone {
+      border: 2px dashed #555; padding: 8px; cursor: pointer;
+      display: inline-block; transition: background-color 0.2s;
+    }
+     .condensed-upload-zone:hover { background-color: #002200; }
+    .condensed-upload-zone input[type="file"] { display: none; }
+    .condensed-upload-zone label {
+        cursor: pointer; display: flex; flex-direction: column;
+        align-items: flex-start; padding: 3px;
+    }
+    .condensed-upload-zone .filename-container {
+        display: flex; flex-direction: column; align-items: flex-start; padding: 3px;
+    }
+    .condensed-upload-zone .filename-container span { margin-bottom: 3px; font-size: 0.9em; }
+
+    .change-image-button {
+        background-color: #000; color: #00FF00; border: 1px solid #00FF00;
+        padding: 4px 7px; cursor: pointer; display: inline-flex; align-items: center;
+        transition: background-color 0.2s; width: 140px; justify-content: center;
+        font-size: 0.8em; align-self: flex-start; margin-top: 5px;
+    }
+    .download-button {
+        background-color: #000; color: #00FF00; border: 1px solid #00FF00;
+        padding: 6px 10px; cursor: pointer; display: inline-flex; align-items: center;
+        transition: background-color 0.2s; width: 170px; justify-content: center;
+        margin-bottom: 3px; font-size: 0.85em;
+    }
+    .download-button:hover, .change-image-button:hover{ background-color: #002200; }
+    .download-button i { margin-right: 5px; }
     .download-button:disabled {
-        color: #336633;
-        border-color: #336633;
-        cursor: not-allowed;
-        background-color: #001100;
+        color: #336633; border-color: #336633; cursor: not-allowed; background-color: #001100;
     }
+    .download-buttons-grid {
+        display: grid; grid-template-columns: 1fr; gap: 3px;
+        width: 100%; max-width: 170px;
+    }
+    .reset-button-container {
+        width: 100%; margin-top: 10px; display: flex; justify-content: flex-start;
+    }
+    .reset-button {
+        background-color: #220000; color: #FF6666; border: 1px solid #FF6666;
+        padding: 6px 10px; width: auto; min-width: 160px;
+        cursor: pointer; transition: background-color 0.2s;
+    }
+    .reset-button:hover { background-color: #440000; }
 
 
-    /* Mobile responsiveness */
+    .mobile-panel {
+        display: none; width: 100%; flex-direction: column; align-items: center;
+        padding: 10px; box-sizing: border-box; background-color: #000; flex-shrink: 0;
+    }
+    #mobileUploadPanelPlaceholder { border-bottom: 1px solid #555; align-items: flex-start; }
+    #mobileDownloadPanelPlaceholder { border-top: 1px solid #555; align-items: flex-start; }
+    #mobileSettingsPanel { border-bottom: 1px solid #555; border-top: 1px solid #555; }
+
     @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-        height: calc(100% - 250px);
+      body { justify-content: flex-start; }
+      .container { flex-direction: column; }
+      .settings-panel-container { display: none !important; }
+      .mobile-panel { display: flex; }
+      .mobile-panel .settings-panel-section-content h2 { display: block; margin-bottom: 5px; text-align: left; }
+      .upload-panel-content, .download-panel-content { border-right: none !important; border-left: none !important; }
+      .settings-panel-section-content > .control-group,
+      .settings-panel-section-content > .condensed-upload-zone,
+      .settings-panel-section-content > .download-buttons-grid,
+      .settings-panel-section-content > .image-settings-layout,
+      .settings-panel-section-content > .output-settings-layout,
+      .settings-panel-section-content > .font-settings-layout,
+      .settings-panel-section-content > .checkbox-container {
+          margin-left: 0; width: 100%;
       }
+      .image-settings-layout, .output-settings-layout, .font-settings-layout { flex-direction: column; gap: 0; }
+      .settings-column { margin-bottom: 10px; width: 100%;}
 
-       .column-header {
-            height: 50px;
-            border-top: 1px solid #555;
-        }
 
-      .input-column, .output-column {
-        width: 100%;
-        height: 50%;
-        padding: 0;
-        border-right: none;
+      .column-header { height: 50px; border-top: 1px solid #555; }
+      .input-column, .output-column { width: 100%; flex-grow: 1; min-height: 150px; border-right: none; }
+      #outputCanvas { height: calc(100% - 50px); }
+      .settings-panel-section-content {
+            margin-bottom: 10px; width: 100%; padding: 0 5px; overflow-y: visible; align-items: flex-start;
       }
-
-      .imageCanvas {
-        width: 100%;
-        height: 100%;
-        max-width: 100%;
-        max-height: 100%;
+      .settings-image-content .slider-container,
+      .settings-image-content .checkbox-container,
+      .settings-image-content .reset-button-container,
+      .settings-font-content .control-container,
+      .settings-output-content .control-container { align-items: center; }
+      .upload-panel-content, .download-panel-content { align-items: flex-start; }
+      .download-buttons-grid { max-width: 100%; }
+      .change-image-button, .download-button, .reset-button { width: 100%; max-width: none; }
+      .slider-container input[type="range"], .input-group input[type="number"], .select-group select {
+          width: 100%;
+          max-width: none;
       }
-
-      #outputCanvas {
-        width: 100%;
-        height: calc(100% - 50px);
-        max-width: 100%;
-      }
-
-      .upload-zone {
-        width: 100%;
-        height: 100%;
-      }
-
-       .settings-panel {
-          flex-direction: column;
-          height: auto;
-          min-height: 250px;
-          padding: 10px;
-       }
-
-       .settings-section {
-            text-align: center;
-            margin-bottom: 10px;
-            width: 100%;
-            padding: 0 5px;
-            overflow-y: visible;
-       }
-       .settings-section.left, .settings-section.right, .settings-section.image-settings,
-       .settings-section.font-settings, .settings-section.output-settings {
-            align-items: center; /* Center all sections on mobile */
-       }
-
-        .change-image-button, .download-button {
-            width: 90%;
-            max-width: 220px;
-        }
-         .slider-container input[type="range"], .input-group input[type="number"] {
-            max-width: 180px;
-        }
     }
   </style>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
+  <div class="mobile-panel" id="mobileUploadPanelPlaceholder"></div>
 
-  <div class="container">
+  <div class="container" id="mainContainer">
     <div class="input-column" id="inputColumn">
       <div class="column-header">
         <h2>Input Image</h2>
@@ -354,7 +448,7 @@
       </div>
     </div>
 
-    <div class="output-column">
+    <div class="output-column" id="outputColumn">
       <div class="column-header">
         <h2>Output Image <span id="loadingSpinner" style="display: none;">
                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g><rect width="2" height="5" x="11" y="1" fill="currentColor" opacity=".14"/><rect width="2" height="5" x="11" y="1" fill="currentColor" opacity=".29" transform="rotate(30 12 12)"/><rect width="2" height="5" x="11" y="1" fill="currentColor" opacity=".43" transform="rotate(60 12 12)"/><rect width="2" height="5" x="11" y="1" fill="currentColor" opacity=".57" transform="rotate(90 12 12)"/><rect width="2" height="5" x="11" y="1" fill="currentColor" opacity=".71" transform="rotate(120 12 12)"/><rect width="2" height="5" x="11" y="1" fill="currentColor" opacity=".86" transform="rotate(150 12 12)"/><rect width="2" height="5" x="11" y="1" fill="currentColor" transform="rotate(180 12 12)"/><animateTransform attributeName="transform" calcMode="discrete" dur="0.75s" repeatCount="indefinite" type="rotate" values="0 12 12;30 12 12;60 12 12;90 12 12;120 12 12;150 12 12;180 12 12;210 12 12;240 12 12;270 12 12;300 12 12;330 12 12;360 12 12"/></g></svg>
@@ -365,8 +459,13 @@
     </div>
   </div>
 
-  <div class="settings-panel">
-    <div class="settings-section left">
+  <div class="mobile-panel" id="mobileSettingsPanel"></div>
+  <div class="mobile-panel" id="mobileDownloadPanelPlaceholder"></div>
+
+
+  <div class="settings-panel-container" id="desktopSettingsPanel">
+    <div class="settings-panel-section-content upload-panel-content" id="uploadPanelContent">
+      <h2 id="uploadPanelTitle" class="initially-hidden">Upload</h2>
       <div class="condensed-upload-zone" id="condensedUploadZone" style="display: none;">
         <label for="condensedImageUpload">
             <div class="filename-container">
@@ -377,44 +476,141 @@
         </label>
       </div>
     </div>
-    <div class="settings-section image-settings"> <!-- Renamed from center -->
-        <div class="slider-container">
-            <label for="levelsSlider">Grayscale Levels: <span id="levelsValueDisplay">4</span></label>
-            <input type="range" id="levelsSlider" min="2" max="8" value="4">
-        </div>
-        <div class="slider-container">
-            <label for="brightnessSlider">Brightness: <span id="brightnessValueDisplay">0</span></label>
-            <input type="range" id="brightnessSlider" min="-100" max="100" value="0">
-        </div>
-        <div class="slider-container">
-            <label for="contrastSlider">Contrast: <span id="contrastValueDisplay">0</span></label>
-            <input type="range" id="contrastSlider" min="-100" max="100" value="0">
-        </div>
+    <div class="settings-panel-section-content settings-title-section" id="settingsTitleSection">
+        <h2>Settings for</h2>
     </div>
-    <div class="settings-section font-settings">
-        <div class="control-container"> <!-- Using generic control-container -->
-            <label for="densityInput">Density: <span id="densityValueDisplay">10</span></label>
-            <div class="input-group"> <!-- Using generic input-group -->
-                <button id="densityDecrement"><</button>
-                <input type="number" id="densityInput" min="1" max="20" value="10">
-                <button id="densityIncrement">></button>
+    <div class="settings-panel-section-content settings-image-content" id="imageSettingsContent">
+      <h2>Image</h2>
+      <div class="image-settings-layout">
+            <div class="settings-column">
+                <div class="checkbox-container control-group">
+                    <input type="checkbox" id="invertColorsToggle">
+                    <label for="invertColorsToggle">Invert</label>
+                </div>
+                <div class="slider-container control-group">
+                    <label for="levelsSlider">Grayscale Values <span id="levelsValueDisplay">4</span></label>
+                    <input type="range" id="levelsSlider" min="2" max="8" value="4">
+                </div>
+                <div class="slider-container control-group">
+                    <label for="brightnessSlider">Brightness <span id="brightnessValueDisplay">0</span></label>
+                    <input type="range" id="brightnessSlider" min="-100" max="100" value="0">
+                </div>
+                <div class="slider-container control-group">
+                    <label for="blurAmountSlider">Blur <span id="blurAmountValueDisplay">0</span></label>
+                    <input type="range" id="blurAmountSlider" min="0" max="5" value="0">
+                </div>
+            </div>
+            <div class="settings-column">
+                <div class="slider-container control-group">
+                    <label for="highlightInputSlider">Highlight <span id="highlightInputValueDisplay">255</span></label>
+                    <input type="range" id="highlightInputSlider" min="0" max="255" value="255">
+                </div>
+                <div class="slider-container control-group">
+                    <label for="midtoneGammaSlider">Midtone <span id="midtoneGammaValueDisplay">1.0</span></label>
+                    <input type="range" id="midtoneGammaSlider" min="0.1" max="2" value="1" step="0.1">
+                </div>
+                 <div class="slider-container control-group">
+                    <label for="shadowInputSlider">Shadow <span id="shadowInputValueDisplay">0</span></label>
+                    <input type="range" id="shadowInputSlider" min="0" max="255" value="0">
+                </div>
+            </div>
+            <div class="settings-column">
+                 <div class="checkbox-container control-group">
+                    <input type="checkbox" id="previewChangesToggle">
+                    <label for="previewChangesToggle">Preview Changes</label>
+                </div>
+                 <div class="reset-button-container control-group">
+                    <button class="reset-button" id="resetImageSettingsButton">Reset Image Settings</button>
+                </div>
             </div>
         </div>
     </div>
-    <div class="settings-section output-settings"> <!-- New Output Settings Section -->
-        <div class="control-container">
-            <label>Output: <span id="outputResolutionDisplay">-</span></label>
-        </div>
-        <div class="control-container">
-            <label for="scaleFactorInput">Scale Factor: <span id="scaleFactorValueDisplay">1</span>x</label>
-            <div class="input-group">
-                <button id="scaleFactorDecrement"><</button>
-                <input type="number" id="scaleFactorInput" min="1" max="5" value="1" step="0.5">
-                <button id="scaleFactorIncrement">></button>
+    <div class="settings-panel-section-content settings-font-content" id="fontSettingsContent">
+      <h2>Font</h2>
+      <div class="font-settings-layout">
+            <div class="settings-column">
+                <div class="control-container control-group char-set-control">
+                    <label for="characterSetSelect">Character Set</label>
+                    <div class="select-group">
+                        <button id="prevCharSetButton"><</button>
+                        <select id="characterSetSelect">
+                            <option value="binary">Binary (0,1)</option>
+                            <option value="numbers">Numbers (0-9)</option>
+                            <option value="latin">Latin (A-Z,0-9)</option>
+                            <option value="arabic">Arabic</option>
+                            <option value="chinese">Chinese</option>
+                            <option value="cyrillic">Cyrillic</option>
+                            <option value="japanese">Japanese</option>
+                            <option value="korean">Korean</option>
+                            <option value="randomizeAll">Randomize All</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <button id="nextCharSetButton">></button>
+                    </div>
+                </div>
+                 <div class="control-container control-group" id="customCharsContainer" style="display: none;">
+                    <input type="text" id="customCharsInput" placeholder="Chars/words, comma separated">
+                    <label for="customCharsInput" style="font-size: 0.8em; margin-top: 5px;">Presets:</label>
+                    <div class="presets-container" id="customCharsPresets">
+                        {/* Preset buttons will be added here */}
+                    </div>
+                </div>
+            </div>
+            <div class="settings-column">
+                 <div class="control-container control-group">
+                    <label for="densityInput">Density</label>
+                    <div class="input-group">
+                        <button id="densityDecrement"><</button>
+                        <input type="number" id="densityInput" min="1" max="20" value="5">
+                        <button id="densityIncrement">></button>
+                    </div>
+                </div>
+                <div class="control-container control-group">
+                    <label for="fontSelect">Font Family</label>
+                    <div class="select-group">
+                        <button id="prevFontButton"><</button>
+                        <select id="fontSelect"></select>
+                        <button id="nextFontButton">></button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="settings-section right">
+    <div class="settings-panel-section-content settings-output-content" id="outputSettingsContent">
+      <h2>Output</h2>
+      <div class="output-settings-layout">
+            <div class="settings-column">
+                <div class="control-container control-group">
+                    <label for="scaleFactorInput">Scale Factor</label>
+                    <div class="input-group">
+                        <button id="scaleFactorDecrement"><</button>
+                        <input type="number" id="scaleFactorInput" min="1" max="5" value="1" step="0.5">
+                        <button id="scaleFactorIncrement">></button>
+                    </div>
+                </div>
+                <div class="control-container control-group">
+                    <label>Output: <span id="outputResolutionDisplay">-</span></label>
+                </div>
+            </div>
+            <div class="settings-column">
+                 <div class="control-container control-group">
+                    <label for="colorSchemeSelect">Color Scheme</label>
+                    <div class="select-group">
+                        <button id="prevColorSchemeButton"><</button>
+                        <select id="colorSchemeSelect">
+                            <option value="greenOnBlack">Green on Black</option>
+                            <option value="whiteOnBlack">White on Black</option>
+                            <option value="blackOnWhite">Black on White</option>
+                        </select>
+                        <button id="nextColorSchemeButton">></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="settings-panel-section-content download-panel-content" id="downloadPanelContent">
+      <h2>Export</h2>
+      <div class="download-buttons-grid">
         <button class="download-button" onclick="openNewTab()" id="openNewTabButton">
             <i class="ri-external-link-line"></i> Open in New Tab
         </button>
@@ -424,6 +620,7 @@
         <button class="download-button" onclick="downloadText()" id="downloadTextButton">
             <i class="ri-download-2-line"></i> Download as .txt
         </button>
+      </div>
     </div>
   </div>
 
@@ -438,43 +635,106 @@
     const condensedImageUpload = document.getElementById('condensedImageUpload');
     const condensedUploadZone = document.getElementById('condensedUploadZone');
     const condensedFilename = document.getElementById('condensedFilename');
+    const uploadPanelTitle = document.getElementById('uploadPanelTitle');
 
     const levelsSlider = document.getElementById('levelsSlider');
     const levelsValueDisplay = document.getElementById('levelsValueDisplay');
     const brightnessSlider = document.getElementById('brightnessSlider');
     const brightnessValueDisplay = document.getElementById('brightnessValueDisplay');
-    const contrastSlider = document.getElementById('contrastSlider');
-    const contrastValueDisplay = document.getElementById('contrastValueDisplay');
+    const shadowInputSlider = document.getElementById('shadowInputSlider');
+    const shadowInputValueDisplay = document.getElementById('shadowInputValueDisplay');
+    const midtoneGammaSlider = document.getElementById('midtoneGammaSlider');
+    const midtoneGammaValueDisplay = document.getElementById('midtoneGammaValueDisplay');
+    const highlightInputSlider = document.getElementById('highlightInputSlider');
+    const highlightInputValueDisplay = document.getElementById('highlightInputValueDisplay');
+    const previewChangesToggle = document.getElementById('previewChangesToggle');
+    const resetImageSettingsButton = document.getElementById('resetImageSettingsButton');
+    const invertColorsToggle = document.getElementById('invertColorsToggle');
+    const blurAmountSlider = document.getElementById('blurAmountSlider');
+    const blurAmountValueDisplay = document.getElementById('blurAmountValueDisplay');
+
 
     const densityInput = document.getElementById('densityInput');
-    const densityValueDisplay = document.getElementById('densityValueDisplay');
     const densityDecrement = document.getElementById('densityDecrement');
     const densityIncrement = document.getElementById('densityIncrement');
+    const fontSelect = document.getElementById('fontSelect');
+    const prevFontButton = document.getElementById('prevFontButton');
+    const nextFontButton = document.getElementById('nextFontButton');
+    const characterSetSelect = document.getElementById('characterSetSelect');
+    const prevCharSetButton = document.getElementById('prevCharSetButton');
+    const nextCharSetButton = document.getElementById('nextCharSetButton');
+    const customCharsContainer = document.getElementById('customCharsContainer');
+    const customCharsInput = document.getElementById('customCharsInput');
+    const customCharsPresets = document.getElementById('customCharsPresets');
+
 
     const scaleFactorInput = document.getElementById('scaleFactorInput');
-    const scaleFactorValueDisplay = document.getElementById('scaleFactorValueDisplay');
     const scaleFactorDecrement = document.getElementById('scaleFactorDecrement');
     const scaleFactorIncrement = document.getElementById('scaleFactorIncrement');
     const outputResolutionDisplay = document.getElementById('outputResolutionDisplay');
+    const colorSchemeSelect = document.getElementById('colorSchemeSelect');
+    const prevColorSchemeButton = document.getElementById('prevColorSchemeButton');
+    const nextColorSchemeButton = document.getElementById('nextColorSchemeButton');
 
 
     const openNewTabButton = document.getElementById('openNewTabButton');
     const downloadPngButton = document.getElementById('downloadPngButton');
     const downloadTextButton = document.getElementById('downloadTextButton');
 
+    const mainContainer = document.getElementById('mainContainer');
+    const desktopSettingsPanelContainer = document.getElementById('desktopSettingsPanel');
+    const mobileSettingsPanel = document.getElementById('mobileSettingsPanel');
+    const mobileUploadPanelPlaceholder = document.getElementById('mobileUploadPanelPlaceholder');
+    const mobileDownloadPanelPlaceholder = document.getElementById('mobileDownloadPanelPlaceholder');
+
+    const uploadPanelContent = document.getElementById('uploadPanelContent');
+    const settingsTitleSection = document.getElementById('settingsTitleSection');
+    const imageSettingsContent = document.getElementById('imageSettingsContent');
+    const fontSettingsContent = document.getElementById('fontSettingsContent');
+    const outputSettingsContent = document.getElementById('outputSettingsContent');
+    const downloadPanelContent = document.getElementById('downloadPanelContent');
+
+
     let randomNumberMap = {};
-    const numbers = "0123456789";
+    const numbersChars = "0123456789";
+    const binaryChars = "01";
+    const latinChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const japaneseChars = "あいうえおカキクケコ漢字一二三";
+    const koreanChars = "가나다라마바사아자차카타파하";
+    const chineseChars = "你好世界的一是在不了有";
+    const arabicChars = "ابجدهوزحطيكلمنسعفصقرشت";
+    const cyrillicChars = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+    let allCharsForRandomize = numbersChars + binaryChars + latinChars + japaneseChars + koreanChars + chineseChars + arabicChars + cyrillicChars;
+
+
     let currentBlobMatrix = null;
     let currentImageElement = null;
     let originalPixelData = null;
+    let sourcePixelDataForProcessing = null;
     let currentImageOriginalWidth = 0;
     let currentImageOriginalHeight = 0;
+    let isPreviewChangesActive = false;
+    let isInvertColorsActive = false;
 
-    let currentNumLevels = parseInt(levelsSlider.value);
-    let currentBrightness = parseInt(brightnessSlider.value);
-    let currentContrast = parseInt(contrastSlider.value);
-    let currentDensity = parseInt(densityInput.value);
-    let currentScaleFactor = parseFloat(scaleFactorInput.value); // New
+    const availableFonts = [
+        { name: 'Courier New', cssName: '"Courier New", Courier, monospace' },
+        { name: 'Roboto Mono', cssName: '"Roboto Mono", monospace' },
+        { name: 'Source Code Pro', cssName: '"Source Code Pro", monospace' },
+        { name: 'Space Mono', cssName: '"Space Mono", monospace' },
+        { name: 'VT323', cssName: '"VT323", monospace' },
+        { name: 'Cutive Mono', cssName: '"Cutive Mono", monospace' },
+        { name: 'Noto Sans JP', cssName: '"Noto Sans JP", monospace' },
+        { name: 'Noto Sans KR', cssName: '"Noto Sans KR", monospace' },
+        { name: 'Noto Sans SC', cssName: '"Noto Sans SC", monospace' },
+        { name: 'Noto Naskh Arabic', cssName: '"Noto Naskh Arabic", "Noto Sans", serif' }, // Added Noto Sans as fallback
+        { name: 'Noto Sans Cyrllic', cssName: '"Noto Sans Cyrllic", "Noto Sans", monospace' } // Added Noto Sans as fallback
+    ];
+    let currentFontFamily;
+
+    let currentNumLevels, currentBrightness, currentBlurAmount, currentShadowInput,
+        currentMidtoneGamma, currentHighlightInput, currentDensity,
+        currentScaleFactor, currentColorScheme, currentCharacterSet;
+
     const FIXED_FONT_SIZE = 8;
 
 
@@ -483,48 +743,200 @@
         downloadPngButton.disabled = disabled;
         downloadTextButton.disabled = disabled;
     }
-    setDownloadButtonsState(true);
+
+    function setDefaultValues() {
+        levelsSlider.value = 4; levelsValueDisplay.textContent = '4';
+        brightnessSlider.value = 0; brightnessValueDisplay.textContent = '0';
+        blurAmountSlider.value = 0; blurAmountValueDisplay.textContent = '0';
+        shadowInputSlider.value = 0; shadowInputValueDisplay.textContent = '0';
+        midtoneGammaSlider.value = 1.0; midtoneGammaValueDisplay.textContent = '1.0';
+        highlightInputSlider.value = 255; highlightInputValueDisplay.textContent = '255';
+        invertColorsToggle.checked = false;
+        previewChangesToggle.checked = true;
+        densityInput.value = 5;
+        scaleFactorInput.value = 1.0;
+        colorSchemeSelect.value = 'greenOnBlack';
+        fontSelect.selectedIndex = 0;
+        characterSetSelect.value = 'binary'; // Default to Binary
+        customCharsInput.value = '';
+        customCharsContainer.style.display = 'none';
+
+
+        isInvertColorsActive = invertColorsToggle.checked;
+        isPreviewChangesActive = previewChangesToggle.checked;
+        currentNumLevels = parseInt(levelsSlider.value);
+        currentBrightness = parseInt(brightnessSlider.value);
+        currentBlurAmount = parseInt(blurAmountSlider.value);
+        currentShadowInput = parseInt(shadowInputSlider.value);
+        currentMidtoneGamma = parseFloat(midtoneGammaSlider.value);
+        currentHighlightInput = parseInt(highlightInputSlider.value);
+        currentDensity = parseInt(densityInput.value);
+        currentScaleFactor = parseFloat(scaleFactorInput.value);
+        currentColorScheme = colorSchemeSelect.value;
+        currentFontFamily = availableFonts[fontSelect.selectedIndex].cssName;
+        currentCharacterSet = characterSetSelect.value;
+
+        setDownloadButtonsState(true);
+    }
+
 
     function generateGrayscaleLevels(numLevels) {
         if (numLevels < 2) return [0, 1];
         const levels = [];
-        for (let i = 0; i < numLevels; i++) {
-            levels.push(i / (numLevels - 1));
-        }
+        for (let i = 0; i < numLevels; i++) { levels.push(i / (numLevels - 1)); }
         return levels;
     }
 
-    function getRandomNumber(grayscaleValue) {
-        const key = `${grayscaleValue}`;
-        if (!randomNumberMap[key]) {
-            randomNumberMap[key] = Math.floor(Math.random() * numbers.length);
+    function getRandomCharacterForLevel(grayscaleValue, charSet) {
+        let charsToUse;
+        switch (charSet) {
+            case 'binary': return Math.random() < 0.5 ? '0' : '1';
+            case 'latin': charsToUse = latinChars; break;
+            case 'japanese': charsToUse = japaneseChars; break;
+            case 'korean': charsToUse = koreanChars; break;
+            case 'chinese': charsToUse = chineseChars; break;
+            case 'arabic': charsToUse = arabicChars; break;
+            case 'cyrillic': charsToUse = cyrillicChars; break;
+            case 'randomizeAll': charsToUse = allCharsForRandomize; break;
+            case 'numbers':
+            default:
+                charsToUse = numbersChars; // Fallback or explicit numbers
+                const key = `${grayscaleValue}_${charSet}`; // Make key specific if map is per charSet
+                if (!randomNumberMap[key]) {
+                    randomNumberMap[key] = Math.floor(Math.random() * charsToUse.length);
+                }
+                return charsToUse[randomNumberMap[key]];
         }
-        return numbers[randomNumberMap[key]];
+        // For sets other than 'numbers' and 'binary' (that don't use randomNumberMap here)
+        return charsToUse[Math.floor(Math.random() * charsToUse.length)];
     }
 
-    function applyBrightnessContrast(sourcePixelData, width, height, brightness, contrast) {
+
+    function invertPixelData(sourceData) {
+        const invertedData = new Uint8ClampedArray(sourceData.length);
+        for (let i = 0; i < sourceData.length; i += 4) {
+            invertedData[i] = 255 - sourceData[i];
+            invertedData[i + 1] = 255 - sourceData[i + 1];
+            invertedData[i + 2] = 255 - sourceData[i + 2];
+            invertedData[i + 3] = sourceData[i + 3];
+        }
+        return invertedData;
+    }
+
+    function applyBoxBlur(sourceData, width, height, radius) {
+        if (radius === 0) return new Uint8ClampedArray(sourceData);
+        const outputData = new Uint8ClampedArray(sourceData.length);
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                let sumR = 0, sumG = 0, sumB = 0, count = 0;
+                for (let ky = -radius; ky <= radius; ky++) {
+                    for (let kx = -radius; kx <= radius; kx++) {
+                        const pixelY = y + ky; const pixelX = x + kx;
+                        if (pixelX >= 0 && pixelX < width && pixelY >= 0 && pixelY < height) {
+                            const i = (pixelY * width + pixelX) * 4;
+                            sumR += sourceData[i]; sumG += sourceData[i + 1]; sumB += sourceData[i + 2];
+                            count++;
+                        }
+                    }
+                }
+                const currentIndex = (y * width + x) * 4;
+                outputData[currentIndex] = sumR / count;
+                outputData[currentIndex + 1] = sumG / count;
+                outputData[currentIndex + 2] = sumB / count;
+                outputData[currentIndex + 3] = sourceData[currentIndex + 3];
+            }
+        }
+        return outputData;
+    }
+
+
+    function applyLevelsAndBrightness(sourcePixelData, width, height, brightness, shadowIn, gamma, highlightIn) {
         const data = new Uint8ClampedArray(sourcePixelData);
         const bVal = (brightness / 100.0) * 127.5;
-        const cFactor = (100.0 + contrast) / 100.0;
-
+        const invGamma = 1.0 / gamma;
+        const inputRange = Math.max(1, highlightIn - shadowIn);
         for (let i = 0; i < data.length; i += 4) {
-            let r = data[i] + bVal;
-            let g = data[i + 1] + bVal;
-            let b_ = data[i + 2] + bVal;
-
-            r = (((r / 255.0) - 0.5) * cFactor + 0.5) * 255.0;
-            g = (((g / 255.0) - 0.5) * cFactor + 0.5) * 255.0;
-            b_ = (((b_ / 255.0) - 0.5) * cFactor + 0.5) * 255.0;
-
-            data[i] = Math.max(0, Math.min(255, r));
-            data[i + 1] = Math.max(0, Math.min(255, g));
-            data[i + 2] = Math.max(0, Math.min(255, b_));
+            for (let c = 0; c < 3; c++) {
+                let val = data[i + c] + bVal;
+                if (val <= shadowIn) { val = 0; }
+                else if (val >= highlightIn) { val = 255; }
+                else { val = ((val - shadowIn) / inputRange) * 255; }
+                val = 255 * Math.pow(val / 255, invGamma);
+                data[i + c] = Math.max(0, Math.min(255, val));
+            }
         }
         return data;
     }
 
-    function generateBlobMatrix(pixelDataToProcess, originalWidth, originalHeight, levelsArray, densityStep) {
+    function getCharacterDisplayColor(level, scheme) {
+        const value = Math.round(level * 255);
+        switch (scheme) {
+            case 'whiteOnBlack': return `rgb(${value}, ${value}, ${value})`;
+            case 'blackOnWhite': return `rgb(${255 - value}, ${255 - value}, ${255 - value})`;
+            case 'greenOnBlack': default: return `rgb(0, ${value}, 0)`;
+        }
+    }
+    function getCanvasBackgroundColor(scheme) {
+        switch (scheme) {
+            case 'blackOnWhite': return '#FFFFFF';
+            case 'greenOnBlack': case 'whiteOnBlack': default: return '#000000';
+        }
+    }
+
+    function drawPosterizedPreview(pixelDataToProcess, width, height, levelsArray) {
+        const previewCtx = inputCanvas.getContext('2d');
+        previewCtx.clearRect(0, 0, width, height);
+        const outputImageData = previewCtx.createImageData(width, height);
+        const outputData = outputImageData.data;
+        for (let i = 0; i < pixelDataToProcess.length; i += 4) {
+            const r = pixelDataToProcess[i], g = pixelDataToProcess[i + 1], b = pixelDataToProcess[i + 2], a = pixelDataToProcess[i + 3];
+            const grayscale = (r + g + b) / 3;
+            let closestLevelValue = levelsArray[0];
+            let minDiff = Math.abs(grayscale - closestLevelValue * 255);
+            for (let j = 1; j < levelsArray.length; j++) {
+                const diff = Math.abs(grayscale - levelsArray[j] * 255);
+                if (diff < minDiff) { minDiff = diff; closestLevelValue = levelsArray[j];}
+            }
+            const posterizedVal = Math.round(closestLevelValue * 255);
+            outputData[i] = posterizedVal; outputData[i + 1] = posterizedVal; outputData[i + 2] = posterizedVal; outputData[i + 3] = a;
+        }
+        previewCtx.putImageData(outputImageData, 0, 0);
+    }
+
+    async function updateInputCanvasPreview() {
+        if (!currentImageElement || !originalPixelData) return;
+        let dataForPreview = isInvertColorsActive ? invertPixelData(originalPixelData) : originalPixelData;
+        if (isPreviewChangesActive) {
+            loadingSpinner.style.display = 'inline';
+            await new Promise(resolve => setTimeout(resolve, 0));
+            const tempBlur = parseInt(blurAmountSlider.value);
+            const tempBrightness = parseInt(brightnessSlider.value);
+            const tempShadow = parseInt(shadowInputSlider.value);
+            const tempGamma = parseFloat(midtoneGammaSlider.value);
+            const tempHighlight = parseInt(highlightInputSlider.value);
+            const tempNumLevels = parseInt(levelsSlider.value);
+            let processedForPreview = applyBoxBlur(dataForPreview, currentImageOriginalWidth, currentImageOriginalHeight, tempBlur);
+            processedForPreview = applyLevelsAndBrightness(processedForPreview, currentImageOriginalWidth, currentImageOriginalHeight, tempBrightness, tempShadow, tempGamma, tempHighlight);
+            const previewLevels = generateGrayscaleLevels(tempNumLevels);
+            drawPosterizedPreview(processedForPreview, currentImageOriginalWidth, currentImageOriginalHeight, previewLevels);
+            loadingSpinner.style.display = 'none';
+        } else {
+            inputCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
+             if (isInvertColorsActive) {
+                const invertedOnly = invertPixelData(originalPixelData);
+                const tempImgData = inputCtx.createImageData(currentImageOriginalWidth, currentImageOriginalHeight);
+                tempImgData.data.set(invertedOnly);
+                inputCtx.putImageData(tempImgData, 0, 0);
+            } else {
+                inputCtx.drawImage(currentImageElement, 0, 0, currentImageOriginalWidth, currentImageOriginalHeight);
+            }
+        }
+    }
+
+    function generateBlobMatrix(pixelDataToProcess, originalWidth, originalHeight, levelsArray, densityStep, colorScheme, charSet) {
         let blobMatrix = [];
+        let customSequenceCurrentIndex = 0;
+
         for (let y = 0; y < originalHeight; y += densityStep) {
             let blobRow = [];
             for (let x = 0; x < originalWidth; x += densityStep) {
@@ -532,83 +944,74 @@
                 for (let subY = 0; subY < densityStep && (y + subY) < originalHeight; subY++) {
                     for (let subX = 0; subX < densityStep && (x + subX) < originalWidth; subX++) {
                         const i = ((y + subY) * originalWidth + (x + subX)) * 4;
-                        avgR += pixelDataToProcess[i];
-                        avgG += pixelDataToProcess[i+1];
-                        avgB += pixelDataToProcess[i+2];
-                        count++;
+                        avgR += pixelDataToProcess[i]; avgG += pixelDataToProcess[i+1]; avgB += pixelDataToProcess[i+2]; count++;
                     }
                 }
                 if (count === 0) continue;
-                avgR /= count;
-                avgG /= count;
-                avgB /= count;
-
+                avgR /= count; avgG /= count; avgB /= count;
                 const grayscale = (avgR + avgG + avgB) / 3;
-
                 let closestLevelValue = levelsArray[0];
                 let minDiff = Math.abs(grayscale - closestLevelValue * 255);
-
                 for (let j = 1; j < levelsArray.length; j++) {
                     const diff = Math.abs(grayscale - levelsArray[j] * 255);
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        closestLevelValue = levelsArray[j];
-                    }
+                    if (diff < minDiff) { minDiff = diff; closestLevelValue = levelsArray[j]; }
+                }
+                let char = ' '; let color = getCharacterDisplayColor(0, colorScheme); let shouldDrawChar = false;
+                if (colorScheme === 'blackOnWhite') {
+                    shouldDrawChar = closestLevelValue < 1 || (levelsArray.length === 1 && levelsArray[0] === 1 && grayscale > 128);
+                } else {
+                    shouldDrawChar = closestLevelValue > 0 || (levelsArray.length === 1 && levelsArray[0] === 0 && grayscale < 128) || (levelsArray.length > 1 && closestLevelValue === 0);
                 }
 
-                let char = ' ';
-                let color = '#000';
-                 if (closestLevelValue > 0 || (levelsArray.length === 1 && levelsArray[0] === 0 && grayscale < 128) || (levelsArray.length > 1 && closestLevelValue === 0)) {
-                    const randomNumber = getRandomNumber(closestLevelValue);
-                    char = randomNumber.toString();
-                    const greenValue = Math.round(closestLevelValue * 255);
-                    color = `rgb(0, ${greenValue}, 0)`;
+                if (shouldDrawChar) {
+                    if (charSet === 'custom') {
+                        const customText = customCharsInput.value.trim();
+                        if (customText) {
+                            if (customText.includes(',')) {
+                                const customItems = customText.split(',').map(s => s.trim()).filter(s => s);
+                                if (customItems.length > 0) {
+                                    char = customItems[Math.floor(Math.random() * customItems.length)];
+                                } else { char = '#'; }
+                            } else {
+                                char = customText[customSequenceCurrentIndex % customText.length];
+                                customSequenceCurrentIndex++;
+                            }
+                        } else { char = '#'; }
+                    } else {
+                        char = getRandomCharacterForLevel(closestLevelValue, charSet);
+                    }
+                    color = getCharacterDisplayColor(closestLevelValue, colorScheme);
                 }
                 blobRow.push({char: char, color: color});
             }
-            if (blobRow.length > 0) {
-                 blobMatrix.push(blobRow);
-            }
+            if (blobRow.length > 0) { blobMatrix.push(blobRow); }
         }
         return blobMatrix;
     }
 
-    function drawTextOnCanvas(matrixToDraw, scaleFactor) {
+    function drawTextOnCanvas(matrixToDraw, scaleFactor, colorScheme, fontFamily) {
         return new Promise((resolve) => {
             requestAnimationFrame(() => {
                 const baseCharSize = FIXED_FONT_SIZE;
                 const effectiveCharSize = baseCharSize * scaleFactor;
-                const charWidth = effectiveCharSize;
-                const charHeight = effectiveCharSize;
-
+                const charWidth = effectiveCharSize; const charHeight = effectiveCharSize;
                 if (matrixToDraw.length === 0 || matrixToDraw[0].length === 0) {
-                    outputCanvas.width = 1;
-                    outputCanvas.height = 1;
-                    outputCtx.clearRect(0,0,1,1);
-                    outputResolutionDisplay.textContent = `${outputCanvas.width}x${outputCanvas.height} px`;
-                    resolve();
-                    return;
+                    outputCanvas.width = 1; outputCanvas.height = 1; outputCtx.clearRect(0,0,1,1);
+                    if (outputResolutionDisplay) outputResolutionDisplay.textContent = `${outputCanvas.width}x${outputCanvas.height}`;
+                    resolve(); return;
                 }
+                const numOutputRows = matrixToDraw.length; const numOutputCols = matrixToDraw[0].length;
+                outputCanvas.width = Math.max(1, numOutputCols * charWidth);
+                outputCanvas.height = Math.max(1, numOutputRows * charHeight);
+                if (outputResolutionDisplay) outputResolutionDisplay.textContent = `${outputCanvas.width}x${outputCanvas.height}`;
 
-                const numOutputRows = matrixToDraw.length;
-                const numOutputCols = matrixToDraw[0].length;
-
-                outputCanvas.width = Math.max(1, numOutputCols * charWidth); // Ensure width is at least 1
-                outputCanvas.height = Math.max(1, numOutputRows * charHeight); // Ensure height is at least 1
-                outputResolutionDisplay.textContent = `${outputCanvas.width}x${outputCanvas.height} px`;
-
-
-                outputCtx.font = effectiveCharSize + 'px "Courier New", Courier, monospace';
-                outputCtx.textAlign = 'left';
-                outputCtx.textBaseline = 'top';
-
+                outputCtx.font = `${effectiveCharSize}px ${fontFamily}`;
+                outputCtx.textAlign = 'left'; outputCtx.textBaseline = 'top';
                 outputCtx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
-                outputCtx.fillStyle = '#000';
+                outputCtx.fillStyle = getCanvasBackgroundColor(colorScheme);
                 outputCtx.fillRect(0, 0, outputCanvas.width, outputCanvas.height);
-
-                outputCtx.font = effectiveCharSize + 'px "Courier New", Courier, monospace';
-                outputCtx.textAlign = 'left';
-                outputCtx.textBaseline = 'top';
+                outputCtx.font = `${effectiveCharSize}px ${fontFamily}`;
+                outputCtx.textAlign = 'left'; outputCtx.textBaseline = 'top';
 
                 let currentY = 0;
                 for (let y = 0; y < numOutputRows; y++) {
@@ -629,62 +1032,56 @@
 
     async function processImageWithCurrentSettings() {
         if (!originalPixelData) return;
+        loadingSpinner.style.display = 'inline'; setDownloadButtonsState(true);
 
-        loadingSpinner.style.display = 'inline';
-        setDownloadButtonsState(true);
+        isInvertColorsActive = invertColorsToggle.checked;
+        currentNumLevels = parseInt(levelsSlider.value); currentBrightness = parseInt(brightnessSlider.value);
+        currentBlurAmount = parseInt(blurAmountSlider.value);
+        currentShadowInput = parseInt(shadowInputSlider.value); currentMidtoneGamma = parseFloat(midtoneGammaSlider.value);
+        currentHighlightInput = parseInt(highlightInputSlider.value); currentDensity = parseInt(densityInput.value);
+        currentScaleFactor = parseFloat(scaleFactorInput.value); currentColorScheme = colorSchemeSelect.value;
+        currentFontFamily = availableFonts[fontSelect.selectedIndex].cssName;
+        currentCharacterSet = characterSetSelect.value;
 
-        currentNumLevels = parseInt(levelsSlider.value);
-        currentBrightness = parseInt(brightnessSlider.value);
-        currentContrast = parseInt(contrastSlider.value);
-        currentDensity = parseInt(densityInput.value);
-        currentScaleFactor = parseFloat(scaleFactorInput.value);
 
         await new Promise(resolve => setTimeout(resolve, 0));
 
-        const modifiedPixelData = applyBrightnessContrast(originalPixelData, currentImageOriginalWidth, currentImageOriginalHeight, currentBrightness, currentContrast);
+        sourcePixelDataForProcessing = isInvertColorsActive ? invertPixelData(originalPixelData) : originalPixelData;
+        let processedData = applyBoxBlur(sourcePixelDataForProcessing, currentImageOriginalWidth, currentImageOriginalHeight, currentBlurAmount);
+        processedData = applyLevelsAndBrightness(processedData, currentImageOriginalWidth, currentImageOriginalHeight, currentBrightness, currentShadowInput, currentMidtoneGamma, currentHighlightInput);
+
+        if (isPreviewChangesActive) { await updateInputCanvasPreview(); }
+
         const localGrayscaleLevels = generateGrayscaleLevels(currentNumLevels);
-        currentBlobMatrix = generateBlobMatrix(modifiedPixelData, currentImageOriginalWidth, currentImageOriginalHeight, localGrayscaleLevels, currentDensity);
-
-        await drawTextOnCanvas(currentBlobMatrix, currentScaleFactor);
-
-        loadingSpinner.style.display = 'none';
-        setDownloadButtonsState(false);
+        currentBlobMatrix = generateBlobMatrix(processedData, currentImageOriginalWidth, currentImageOriginalHeight, localGrayscaleLevels, currentDensity, currentColorScheme, currentCharacterSet);
+        await drawTextOnCanvas(currentBlobMatrix, currentScaleFactor, currentColorScheme, currentFontFamily);
+        loadingSpinner.style.display = 'none'; setDownloadButtonsState(false);
     }
 
-
     function handleImageUpload(file) {
-       loadingSpinner.style.display = 'inline';
-       setDownloadButtonsState(true);
+       loadingSpinner.style.display = 'inline'; setDownloadButtonsState(true);
         const reader = new FileReader();
-
         reader.onload = function(event) {
           const img = new Image();
           img.onload = async function() {
-            currentImageElement = img;
-            currentImageOriginalWidth = img.width;
-            currentImageOriginalHeight = img.height;
+            currentImageElement = img; currentImageOriginalWidth = img.width; currentImageOriginalHeight = img.height;
             randomNumberMap = {};
-
-            inputCanvas.width = currentImageOriginalWidth;
-            inputCanvas.height = currentImageOriginalHeight;
+            inputCanvas.width = currentImageOriginalWidth; inputCanvas.height = currentImageOriginalHeight;
             inputCtx.drawImage(img, 0, 0, currentImageOriginalWidth, currentImageOriginalHeight);
-
             const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = currentImageOriginalWidth;
-            tempCanvas.height = currentImageOriginalHeight;
+            tempCanvas.width = currentImageOriginalWidth; tempCanvas.height = currentImageOriginalHeight;
             const tempCtx = tempCanvas.getContext('2d');
             tempCtx.drawImage(img, 0, 0, currentImageOriginalWidth, currentImageOriginalHeight);
             originalPixelData = tempCtx.getImageData(0, 0, currentImageOriginalWidth, currentImageOriginalHeight).data;
-
+            sourcePixelDataForProcessing = originalPixelData;
+            setDefaultValues();
             await processImageWithCurrentSettings();
-
-            inputCanvas.style.display = 'block';
-            uploadZone.style.display = 'none';
+            await updateInputCanvasPreview();
+            inputCanvas.style.display = 'block'; uploadZone.style.display = 'none';
+            if(uploadPanelTitle) uploadPanelTitle.style.display = 'block';
           }
-
           img.src = event.target.result;
         }
-
         reader.readAsDataURL(file);
     }
 
@@ -693,170 +1090,259 @@
            handleImageUpload(e.target.files[0]);
            condensedUploadZone.style.display = 'inline-block';
            condensedFilename.innerHTML = `<i class="ri-check-line"></i> ${e.target.files[0].name} `;
+           if(uploadPanelTitle) uploadPanelTitle.style.display = 'block';
        }
     });
-
     condensedImageUpload.addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             handleImageUpload(file);
             condensedFilename.innerHTML = `<i class="ri-check-line"></i> ${file.name} `;
+            if(uploadPanelTitle) uploadPanelTitle.style.display = 'block';
         }
     });
 
-    levelsSlider.addEventListener('input', function() {
-        levelsValueDisplay.textContent = this.value;
+    previewChangesToggle.addEventListener('change', function() { isPreviewChangesActive = this.checked; updateInputCanvasPreview(); });
+    invertColorsToggle.addEventListener('change', function() {
+        isInvertColorsActive = this.checked;
+        updateInputCanvasPreview();
         processImageWithCurrentSettings();
     });
-    brightnessSlider.addEventListener('input', function() {
-        brightnessValueDisplay.textContent = this.value;
+    blurAmountSlider.addEventListener('input', function() {
+        blurAmountValueDisplay.textContent = this.value;
+        updateInputCanvasPreview();
         processImageWithCurrentSettings();
     });
-    contrastSlider.addEventListener('input', function() {
-        contrastValueDisplay.textContent = this.value;
+
+    levelsSlider.addEventListener('input', function() { levelsValueDisplay.textContent = this.value; updateInputCanvasPreview(); processImageWithCurrentSettings(); });
+    brightnessSlider.addEventListener('input', function() { brightnessValueDisplay.textContent = this.value; updateInputCanvasPreview(); processImageWithCurrentSettings(); });
+    shadowInputSlider.addEventListener('input', function() { shadowInputValueDisplay.textContent = this.value; updateInputCanvasPreview(); processImageWithCurrentSettings(); });
+    midtoneGammaSlider.addEventListener('input', function() { midtoneGammaValueDisplay.textContent = parseFloat(this.value).toFixed(1); updateInputCanvasPreview(); processImageWithCurrentSettings(); });
+    highlightInputSlider.addEventListener('input', function() { highlightInputValueDisplay.textContent = this.value; updateInputCanvasPreview(); processImageWithCurrentSettings(); });
+    colorSchemeSelect.addEventListener('change', processImageWithCurrentSettings);
+    fontSelect.addEventListener('change', processImageWithCurrentSettings);
+
+    characterSetSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customCharsContainer.style.display = 'flex';
+        } else {
+            customCharsContainer.style.display = 'none';
+        }
         processImageWithCurrentSettings();
     });
+    customCharsInput.addEventListener('change', processImageWithCurrentSettings);
+
+
+    resetImageSettingsButton.addEventListener('click', () => {
+        invertColorsToggle.checked = false;
+        levelsSlider.value = 4;
+        brightnessSlider.value = 0;
+        blurAmountSlider.value = 0;
+        shadowInputSlider.value = 0;
+        midtoneGammaSlider.value = 1.0;
+        highlightInputSlider.value = 255;
+
+        levelsValueDisplay.textContent = '4';
+        brightnessValueDisplay.textContent = '0';
+        blurAmountValueDisplay.textContent = '0';
+        shadowInputValueDisplay.textContent = '0';
+        midtoneGammaValueDisplay.textContent = '1.0';
+        highlightInputValueDisplay.textContent = '255';
+        isInvertColorsActive = false;
+        updateInputCanvasPreview();
+        processImageWithCurrentSettings();
+    });
+
 
     function updateDensity(newValue) {
-        let val = parseInt(newValue);
-        const min = parseInt(densityInput.min);
-        const max = parseInt(densityInput.max);
-        if (isNaN(val)) val = currentDensity;
-        if (val < min) val = min;
-        if (val > max) val = max;
+        let val = parseInt(newValue); const min = parseInt(densityInput.min); const max = parseInt(densityInput.max);
+        if (isNaN(val)) val = currentDensity; if (val < min) val = min; if (val > max) val = max;
         densityInput.value = val;
-        densityValueDisplay.textContent = val;
-        if (val !== currentDensity) {
-             currentDensity = val;
-             processImageWithCurrentSettings();
-        } else {
-            currentDensity = val;
-        }
+        if (val !== currentDensity) { currentDensity = val; processImageWithCurrentSettings(); } else { currentDensity = val; }
     }
-
-    densityInput.addEventListener('change', function() {
-        updateDensity(this.value);
-    });
+    densityInput.addEventListener('change', function() { updateDensity(this.value); });
     densityInput.addEventListener('input', function() {
-        const val = parseInt(this.value);
-        const min = parseInt(densityInput.min);
-        const max = parseInt(densityInput.max);
-        if (!isNaN(val) && val >=min && val <=max) {
-            densityValueDisplay.textContent = this.value;
-        } else if (this.value === "") {
-            densityValueDisplay.textContent = min;
-        }
+        const val = parseInt(this.value); const min = parseInt(densityInput.min); const max = parseInt(densityInput.max);
+         if (isNaN(val) || val < min || val > max) { /* Optional feedback */ }
     });
-    densityDecrement.addEventListener('click', function() {
-        updateDensity(parseInt(densityInput.value) - 1);
+    densityDecrement.addEventListener('click', function() { updateDensity(parseInt(densityInput.value) - 1); });
+    densityIncrement.addEventListener('click', function() { updateDensity(parseInt(densityInput.value) + 1); });
+
+    prevFontButton.addEventListener('click', function() {
+        let currentIndex = fontSelect.selectedIndex;
+        currentIndex = (currentIndex - 1 + availableFonts.length) % availableFonts.length;
+        fontSelect.selectedIndex = currentIndex;
+        processImageWithCurrentSettings();
     });
-    densityIncrement.addEventListener('click', function() {
-        updateDensity(parseInt(densityInput.value) + 1);
+    nextFontButton.addEventListener('click', function() {
+        let currentIndex = fontSelect.selectedIndex;
+        currentIndex = (currentIndex + 1) % availableFonts.length;
+        fontSelect.selectedIndex = currentIndex;
+        processImageWithCurrentSettings();
+    });
+    prevCharSetButton.addEventListener('click', function() {
+        let currentIndex = characterSetSelect.selectedIndex;
+        currentIndex = (currentIndex - 1 + characterSetSelect.options.length) % characterSetSelect.options.length;
+        characterSetSelect.selectedIndex = currentIndex;
+        characterSetSelect.dispatchEvent(new Event('change'));
+    });
+    nextCharSetButton.addEventListener('click', function() {
+        let currentIndex = characterSetSelect.selectedIndex;
+        currentIndex = (currentIndex + 1) % characterSetSelect.options.length;
+        characterSetSelect.selectedIndex = currentIndex;
+        characterSetSelect.dispatchEvent(new Event('change'));
     });
 
-    // Scale Factor Listeners
+
     function updateScaleFactor(newValue) {
-        let val = parseFloat(newValue);
-        const min = parseFloat(scaleFactorInput.min);
-        const max = parseFloat(scaleFactorInput.max);
-        if (isNaN(val)) val = currentScaleFactor;
-        if (val < min) val = min;
-        if (val > max) val = max;
-        scaleFactorInput.value = val.toFixed(1); // Keep one decimal place
-        scaleFactorValueDisplay.textContent = val.toFixed(1);
-        if (val !== currentScaleFactor) {
-             currentScaleFactor = val;
-             processImageWithCurrentSettings(); // This will redraw with new scale
-        } else {
-            currentScaleFactor = val;
-        }
+        let val = parseFloat(newValue); const min = parseFloat(scaleFactorInput.min); const max = parseFloat(scaleFactorInput.max);
+        if (isNaN(val)) val = currentScaleFactor; if (val < min) val = min; if (val > max) val = max;
+        scaleFactorInput.value = val.toFixed(1);
+        if (val !== currentScaleFactor) { currentScaleFactor = val; processImageWithCurrentSettings(); }
+        else { currentScaleFactor = val; }
     }
-
-    scaleFactorInput.addEventListener('change', function() {
-        updateScaleFactor(this.value);
-    });
+    scaleFactorInput.addEventListener('change', function() { updateScaleFactor(this.value); });
     scaleFactorInput.addEventListener('input', function() {
-        const val = parseFloat(this.value);
-        const min = parseFloat(scaleFactorInput.min);
-        const max = parseFloat(scaleFactorInput.max);
-         if (!isNaN(val) && val >=min && val <=max) {
-            scaleFactorValueDisplay.textContent = parseFloat(this.value).toFixed(1);
-        } else if (this.value === "") {
-            scaleFactorValueDisplay.textContent = min.toFixed(1);
-        }
+        const val = parseFloat(this.value); const min = parseFloat(scaleFactorInput.min); const max = parseFloat(scaleFactorInput.max);
+         if (isNaN(val) || val < min || val > max) { /* Optional feedback */ }
     });
-    scaleFactorDecrement.addEventListener('click', function() {
-        updateScaleFactor(parseFloat(scaleFactorInput.value) - 0.5);
+    scaleFactorDecrement.addEventListener('click', function() { updateScaleFactor(parseFloat(scaleFactorInput.value) - 0.5); });
+    scaleFactorIncrement.addEventListener('click', function() { updateScaleFactor(parseFloat(scaleFactorInput.value) + 0.5); });
+
+    prevColorSchemeButton.addEventListener('click', function() {
+        let currentIndex = colorSchemeSelect.selectedIndex;
+        currentIndex = (currentIndex - 1 + colorSchemeSelect.options.length) % colorSchemeSelect.options.length;
+        colorSchemeSelect.selectedIndex = currentIndex;
+        processImageWithCurrentSettings();
     });
-    scaleFactorIncrement.addEventListener('click', function() {
-        updateScaleFactor(parseFloat(scaleFactorInput.value) + 0.5);
+    nextColorSchemeButton.addEventListener('click', function() {
+        let currentIndex = colorSchemeSelect.selectedIndex;
+        currentIndex = (currentIndex + 1) % colorSchemeSelect.options.length;
+        colorSchemeSelect.selectedIndex = currentIndex;
+        processImageWithCurrentSettings();
     });
 
 
-    inputColumn.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        inputColumn.style.backgroundColor = '#444';
-    });
-
-    inputColumn.addEventListener('dragleave', () => {
-        inputColumn.style.backgroundColor = '#333';
-    });
-
+    inputColumn.addEventListener('dragover', (e) => { e.preventDefault(); inputColumn.style.backgroundColor = '#444'; });
+    inputColumn.addEventListener('dragleave', () => { inputColumn.style.backgroundColor = '#333'; });
     inputColumn.addEventListener('drop', (e) => {
-        e.preventDefault();
-        inputColumn.style.backgroundColor = '#333';
+        e.preventDefault(); inputColumn.style.backgroundColor = '#333';
         const file = e.dataTransfer.files[0];
         if (file && file.type.startsWith('image/')) {
           handleImageUpload(file);
           condensedUploadZone.style.display = 'inline-block';
           condensedFilename.innerHTML = `<i class="ri-check-line"></i> ${file.name} `;
-        } else {
-            alert('Please drop an image file.');
-        }
+           if(uploadPanelTitle) uploadPanelTitle.style.display = 'block';
+        } else { alert('Please drop an image file.'); }
+    });
+    uploadZone.addEventListener('click', () => { imageUpload.click(); });
+
+    condensedUploadZone.addEventListener('dragover', (e) => { e.preventDefault(); condensedUploadZone.style.backgroundColor = '#002200'; });
+    condensedUploadZone.addEventListener('dragleave', () => { condensedUploadZone.style.backgroundColor = 'transparent';});
+    condensedUploadZone.addEventListener('drop', (e) => {
+        e.preventDefault(); condensedUploadZone.style.backgroundColor = 'transparent';
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+          handleImageUpload(file);
+          condensedFilename.innerHTML = `<i class="ri-check-line"></i> ${file.name} `;
+          if(uploadPanelTitle) uploadPanelTitle.style.display = 'block';
+        } else { alert('Please drop an image file.'); }
     });
 
-    uploadZone.addEventListener('click', () => {
-        imageUpload.click();
-    });
 
     function downloadPng() {
         if (!outputCanvas || !currentBlobMatrix) return;
         const imgData = outputCanvas.toDataURL("image/png");
         const link = document.createElement('a');
-        link.href = imgData;
-        link.download = 'ascii_imager.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        link.href = imgData; link.download = 'ascii_imager.png';
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
-
     function downloadText() {
       if (currentBlobMatrix) {
-        let textToDownload = "";
-        for (let y = 0; y < currentBlobMatrix.length; y++) {
-          let row = "";
-          for (let x = 0; x < currentBlobMatrix[y].length; x++) {
-            row += currentBlobMatrix[y][x].char;
-          }
-          textToDownload += row + "\n";
-        }
+        let textToDownload = currentBlobMatrix.map(row => row.map(cell => cell.char).join('')).join('\n');
         const blob = new Blob([textToDownload], { type: "text/plain;charset=utf-8" });
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'ascii_imager.txt';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        link.href = URL.createObjectURL(blob); link.download = 'ascii_imager.txt';
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
       }
     }
-
    function openNewTab() {
        if (!outputCanvas || !currentBlobMatrix) return;
         const imgData = outputCanvas.toDataURL("image/png");
         let newTab = window.open();
-        newTab.document.body.innerHTML = `<img src="${imgData}" style="max-width:100%; height:auto; background-color: black;">`;
+        newTab.document.body.style.backgroundColor = getCanvasBackgroundColor(currentColorScheme);
+        newTab.document.body.innerHTML = `<img src="${imgData}" style="max-width:100%; height:auto;">`;
    }
 
+    function layoutPanels() {
+        const isMobile = window.innerWidth <= 768;
+        desktopSettingsPanelContainer.style.display = isMobile ? 'none' : 'flex';
+        mobileUploadPanelPlaceholder.style.display = isMobile ? 'flex' : 'none';
+        mobileSettingsPanel.style.display = isMobile ? 'flex' : 'none';
+        mobileDownloadPanelPlaceholder.style.display = isMobile ? 'flex' : 'none';
+
+        if (isMobile) {
+            if (uploadPanelContent.parentNode !== mobileUploadPanelPlaceholder) mobileUploadPanelPlaceholder.appendChild(uploadPanelContent);
+            if (settingsTitleSection.parentNode !== mobileSettingsPanel) mobileSettingsPanel.appendChild(settingsTitleSection);
+            if (imageSettingsContent.parentNode !== mobileSettingsPanel) mobileSettingsPanel.appendChild(imageSettingsContent);
+            if (fontSettingsContent.parentNode !== mobileSettingsPanel) mobileSettingsPanel.appendChild(fontSettingsContent);
+            if (outputSettingsContent.parentNode !== mobileSettingsPanel) mobileSettingsPanel.appendChild(outputSettingsContent);
+            if (downloadPanelContent.parentNode !== mobileDownloadPanelPlaceholder) mobileDownloadPanelPlaceholder.appendChild(downloadPanelContent);
+        } else {
+            desktopSettingsPanelContainer.appendChild(uploadPanelContent);
+            desktopSettingsPanelContainer.appendChild(settingsTitleSection);
+            desktopSettingsPanelContainer.appendChild(imageSettingsContent);
+            desktopSettingsPanelContainer.appendChild(fontSettingsContent);
+            desktopSettingsPanelContainer.appendChild(outputSettingsContent);
+            desktopSettingsPanelContainer.appendChild(downloadPanelContent);
+        }
+        let totalNonContainerHeight = 0;
+        if (isMobile) {
+            if (mobileUploadPanelPlaceholder.style.display !== 'none') totalNonContainerHeight += mobileUploadPanelPlaceholder.offsetHeight;
+            if (mobileSettingsPanel.style.display !== 'none') totalNonContainerHeight += mobileSettingsPanel.offsetHeight;
+            if (mobileDownloadPanelPlaceholder.style.display !== 'none') totalNonContainerHeight += mobileDownloadPanelPlaceholder.offsetHeight;
+        } else {
+            if (desktopSettingsPanelContainer.style.display !== 'none') totalNonContainerHeight += desktopSettingsPanelContainer.offsetHeight;
+        }
+        mainContainer.style.height = `calc(100vh - ${totalNonContainerHeight}px)`;
+    }
+
+     function populateCustomCharacterPresets() {
+        const presets = [
+            { name: "1", value: "ABC" },
+            { name: "2", value: "A,B,C" },
+            { name: "3", value: "♥,♦,♣,♠" },
+            { name: "4", value: "•" },
+            { name: "5", value: "■" },
+            { name: "6", value: "█" }
+        ];
+        customCharsPresets.innerHTML = '';
+        presets.forEach(preset => {
+            const button = document.createElement('button');
+            button.classList.add('preset-button');
+            button.textContent = preset.name;
+            button.onclick = () => {
+                customCharsInput.value = preset.value;
+                customCharsInput.dispatchEvent(new Event('change'));
+            };
+            customCharsPresets.appendChild(button);
+        });
+    }
+
+
+    window.addEventListener('resize', layoutPanels);
+    document.addEventListener('DOMContentLoaded', () => {
+        availableFonts.forEach(font => {
+            const option = document.createElement('option');
+            option.value = font.cssName;
+            option.textContent = font.name;
+            fontSelect.appendChild(option);
+        });
+        populateCustomCharacterPresets();
+        setDefaultValues();
+        if(uploadPanelTitle) uploadPanelTitle.style.display = 'none';
+        layoutPanels();
+    });
     inputCanvas.style.display = 'none';
   </script>
 
