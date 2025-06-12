@@ -1,4 +1,4 @@
-# ASCII Imager
+# VisuType
 
 A local web-based tool that turns images into text-based art.
 
