@@ -18,6 +18,8 @@
 
 VisuType is a web application that transforms images and videos into real-time, character-based visual art directly in your browser.
 
+Try it here: https://landonikko.github.io/VisuType
+
 ![VisuType_Home](https://github.com/user-attachments/assets/4b72104b-ada1-49be-8d08-d4b9511bb2ce)
 
 ## ![Features Shield][features-shield]
@@ -35,7 +37,7 @@ VisuType is a web application that transforms images and videos into real-time, 
 
 | Input Image | Output: Binary |
 | :------------: | :---------------: |
-| ![Input Image](https://github.com/user-attachments/assets/6cd90c8b-d13b-41bd-a332-e73e5bd0fd24) | ![VisuType_Binary](https://github.com/user-attachments/assets/cbeb344a-e8dd-4785-935f-9b6f241ba955) |
+| ![Input Image](https://github.com/user-attachments/assets/6cd90c8b-d13b-41bd-a332-e73e5bd0fd24) | ![VisuType_Binary](https://github.com/user-attachments/assets/f96016f4-b1ee-4a04-a27e-78c2bfa431e2) |
 | Output: Chinese Characters | Output: Custom with Unicode Character |
 | ![VisuType_Chinese](https://github.com/user-attachments/assets/562fe261-7747-4de0-9786-d27ae357464a) | ![VisuType_Custom](https://github.com/user-attachments/assets/3b255674-ccf0-4f4e-b30c-9f6926190b7b) |
 
